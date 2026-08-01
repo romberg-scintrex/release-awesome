@@ -1,0 +1,611 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: 250 250 250;
+    --fg: 5 5 5;
+    --muted: 115 115 115;
+    --border: 0 0 0 / 0.08;
+    --card: 255 255 255;
+    --accent: 139 92 246;
+    --noise-opacity: 0.04;
+  }
+
+  .dark {
+    --bg: 5 5 5;
+    --fg: 245 245 245;
+    --muted: 163 163 163;
+    --border: 255 255 255 / 0.08;
+    --card: 17 17 17;
+    --accent: 167 139 250;
+    --noise-opacity: 0.06;
+  }
+
+  * {
+    @apply border-black/10 dark:border-white/10;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  html,
+  body {
+    @apply max-w-full overflow-x-hidden antialiased;
+    background: rgb(var(--bg));
+    color: rgb(var(--fg));
+  }
+
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.25);
+    color: rgb(var(--fg));
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--fg) / 0.18);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--fg) / 0.3);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-xl border border-white/10 bg-white/5 dark:bg-white/[0.03];
+  }
+  .glass-strong {
+    @apply backdrop-blur-2xl border border-white/15 bg-white/10 dark:bg-white/[0.06];
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-violet via-brand-fuchsia to-brand-rose;
+  }
+  .text-gradient-cool {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-cyan via-brand-violet to-brand-fuchsia;
+  }
+  .text-gradient-strong {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(to right, #6d28d9, #a21caf 52%, #be185d);
+  }
+  /* Hero display name — deep, saturated ramp kept dark across every letter so
+     it reads clearly against the cream stage instead of washing out. A slow
+     position drift makes the gradient feel like living light. */
+  .text-gradient-hero {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(100deg, #4c1d95 0%, #6d28d9 22%, #a21caf 50%, #6d28d9 78%, #4c1d95 100%);
+    background-size: 220% 100%;
+    background-position: 0% center;
+    filter: drop-shadow(0 6px 16px rgba(76, 29, 149, 0.28));
+    animation: name-shimmer 7s ease-in-out infinite;
+  }
+  @keyframes name-shimmer {
+    0%,
+    100% {
+      background-position: 0% center;
+    }
+    50% {
+      background-position: 100% center;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .text-gradient-hero {
+      animation: none;
+    }
+  }
+  .ring-focus {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, rgb(var(--fg) / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--fg) / 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+}
+
+@layer utilities {
+  .noise {
+    position: relative;
+  }
+  .noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--noise-opacity);
+    z-index: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  @media (hover: none) {
+    .hide-on-touch {
+      display: none !important;
+    }
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Markdown prose — blog posts & tool descriptions (<Markdown>)
+   Code blocks render as a dark "terminal" card in both themes for
+   consistency. Token colours come from rehype-highlight's hljs classes;
+   the palette below is self-contained (no highlight.js theme file).
+   ─────────────────────────────────────────────────────────────── */
+.prose pre {
+  background: #0d1117;
+  color: #e6edf3;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.85rem;
+}
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  font-weight: 400;
+  color: inherit;
+}
+/* Inline code — subtle chip; strip the typography plugin's backtick quotes */
+.prose :not(pre) > code {
+  background: rgb(var(--fg) / 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 0.4rem;
+  font-weight: 500;
+}
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: "";
+}
+
+.hljs-comment,
+.hljs-quote { color: #8b949e; font-style: italic; }
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-type { color: #ff7b72; }
+.hljs-string,
+.hljs-meta .hljs-string,
+.hljs-regexp,
+.hljs-addition { color: #a5d6ff; }
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet { color: #79c0ff; }
+.hljs-title,
+.hljs-name,
+.hljs-section,
+.hljs-attr,
+.hljs-attribute,
+.hljs-title.function_ { color: #d2a8ff; }
+.hljs-variable,
+.hljs-template-variable,
+.hljs-built_in,
+.hljs-builtin-name { color: #ffa657; }
+.hljs-tag,
+.hljs-selector-id,
+.hljs-selector-class { color: #7ee787; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
+.hljs-deletion { color: #ffa198; }
+
+/* ───────────────────────────────────────────────────────────────
+   Editorial article layout — project case studies & blog posts.
+   Project bodies render plain text via <ArticleBody> (.article-prose);
+   blog bodies pass `prose-article` to <Markdown> so the same lead +
+   drop-cap treatment applies to the first paragraph of GFM content.
+   ─────────────────────────────────────────────────────────────── */
+.article-prose {
+  color: rgb(var(--fg) / 0.82);
+  font-size: 1.075rem;
+  line-height: 1.85;
+  letter-spacing: -0.003em;
+}
+.article-prose p {
+  margin-top: 1.55em;
+}
+.article-prose p:first-child {
+  margin-top: 0;
+}
+.article-prose .lead {
+  font-size: 1.35rem;
+  line-height: 1.62;
+  font-weight: 400;
+  color: rgb(var(--fg) / 0.95);
+}
+
+/* Standfirst lead for Markdown posts: bump the opening paragraph */
+.prose-article > p:first-child {
+  font-size: 1.2rem;
+  line-height: 1.7;
+  color: rgb(var(--fg) / 0.9);
+}
+
+/* Drop cap on the opening paragraph of project case studies only. Their plain
+   text always begins with a letter, so ::first-letter is safe. Blog Markdown
+   keeps the larger standfirst but NO drop cap — post bodies can start with
+   punctuation (e.g. a leading quote), which ::first-letter would enlarge into
+   a broken-looking first word. */
+.article-prose .lead::first-letter {
+  float: left;
+  font-family: var(--font-display), "Outfit", Inter, sans-serif;
+  font-weight: 600;
+  font-size: 3em;
+  line-height: 0.76;
+  margin: 0.05em 0.09em 0 0;
+  color: #6d28d9;
+}
+.dark .article-prose .lead::first-letter {
+  color: #a78bfa;
+}
+
+/* Quiet, refined blockquotes, rules, and anchored headings in long-form prose */
+.prose blockquote {
+  border-left: 3px solid rgb(var(--accent) / 0.55);
+  font-style: normal;
+  color: rgb(var(--fg) / 0.72);
+}
+.prose blockquote p::before,
+.prose blockquote p::after {
+  content: "";
+}
+.prose hr {
+  border-color: rgb(var(--fg) / 0.1);
+  margin: 2.6em 0;
+}
+.prose :where(h2, h3) {
+  scroll-margin-top: 6rem;
+}
+
+/* Gallery / figure caption */
+.fig-caption {
+  margin-top: 0.7rem;
+  padding: 0 0.25rem;
+  font-size: 0.8rem;
+  color: rgb(var(--fg) / 0.5);
+}
+
+/* ── Lenis smooth scrolling (mounted in SiteFrame/SmoothScroll) ──── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ── Sheen sweep across primary buttons on hover ─────────────────── */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.btn-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(15, 12, 28, 0.08) 50%, transparent 62%);
+  transform: translateX(-140%) skewX(-18deg);
+  /* no base transition: on hover-out the band snaps home off-canvas
+     instead of visibly sweeping backwards across the button */
+  transition: none;
+}
+.btn-sheen:hover::after {
+  transform: translateX(140%) skewX(-18deg);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Marquees and sheens hold still for users who ask for less motion */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .animate-marquee {
+    animation: none !important;
+  }
+  .btn-sheen::after {
+    display: none;
+  }
+}
+
+/* Preserve marquee animations used by the existing hero shader-mask */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes scroll-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* Vertical role roller — CSS-driven so it loops reliably on the compositor.
+   --role-rh sets one row's height; the trailing duplicate of the first role
+   lets the loop wrap seamlessly. */
+@keyframes role-roll {
+  0%,  20% { transform: translateY(0); }
+  25%, 45% { transform: translateY(calc(var(--role-rh) * -1)); }
+  50%, 70% { transform: translateY(calc(var(--role-rh) * -2)); }
+  75%, 95% { transform: translateY(calc(var(--role-rh) * -3)); }
+  100%     { transform: translateY(calc(var(--role-rh) * -4)); }
+}
+.role-roll {
+  animation: role-roll var(--role-dur, 10s) ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-roll {
+    animation: none;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Desktop mask-reveal hero — MaskRevealHero.tsx
+   These rules live in the global sheet (loaded in <head>) instead of
+   styled-jsx inside the client component, so the giant marquee artwork
+   is fully styled on the first server-rendered paint. Otherwise the
+   raw, unstyled marquee text flashes on screen until the component's
+   JavaScript hydrates and injects its styles.
+   ─────────────────────────────────────────────────────────────── */
+.hero-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  /* Cinematic warm-cream stage — center bright, edges fall into warmer beige */
+  background:
+    radial-gradient(ellipse 80% 65% at 50% 48%,
+      #fcfbf6 0%,
+      #f6f4ed 40%,
+      #ebe6d6 75%,
+      #e0d9c5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mask-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+.wave-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: #d8d2c2;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  /* Fade pattern at the centre so the subject doesn't sit on busy texture */
+  -webkit-mask-image: radial-gradient(ellipse 55% 60% at 50% 50%, transparent 0%, rgba(0,0,0,0.55) 60%, black 100%);
+  mask-image: radial-gradient(ellipse 55% 60% at 50% 50%, transparent 0%, rgba(0,0,0,0.55) 60%, black 100%);
+}
+.stage-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  /* Soft warm halo that lifts the subject off the marquee */
+  background:
+    radial-gradient(ellipse 38% 55% at 50% 48%,
+      rgba(255, 250, 240, 0.85) 0%,
+      rgba(255, 250, 240, 0.45) 35%,
+      rgba(255, 250, 240, 0) 70%);
+  mix-blend-mode: screen;
+}
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 11;
+  background:
+    radial-gradient(ellipse 90% 95% at 50% 50%,
+      transparent 55%,
+      rgba(60, 40, 20, 0.05) 80%,
+      rgba(60, 40, 20, 0.14) 100%);
+}
+.top-fade {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 180px;
+  pointer-events: none;
+  z-index: 13;
+  background: linear-gradient(to bottom,
+    rgba(252, 251, 246, 0.95) 0%,
+    rgba(252, 251, 246, 0.7) 35%,
+    rgba(252, 251, 246, 0.3) 70%,
+    transparent 100%);
+}
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 200px 200px;
+}
+.marquee-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+.marquee-layer.back {
+  z-index: 1;
+  color: #cfc6ae;
+  opacity: 0.55;
+}
+.marquee-layer.front {
+  z-index: 5;
+  color: #1a1816;
+  /* Punch a soft hole through the subject silhouette so the bold
+     marquee stays off the white shirt / face. */
+  -webkit-mask-image: radial-gradient(ellipse 32% 90% at 50% 70%,
+    transparent 0%, transparent 35%, rgba(0,0,0,0.55) 60%, black 85%);
+  mask-image: radial-gradient(ellipse 32% 90% at 50% 70%,
+    transparent 0%, transparent 35%, rgba(0,0,0,0.55) 60%, black 85%);
+}
+/* Only the lower row gets the bold front treatment; the top row stays faint
+   (back layer only). Targeting the row keeps the bold band on the same words at
+   every viewport - the old clip-path was a fixed % of the container, so on
+   tall/narrow screens (where the vw-based text is small) it sliced the bold row
+   away and left only the unreadable faint back text on the dark background.
+   visibility:hidden (not display:none) preserves layout so the front row stays
+   pixel-aligned over its faint back twin. */
+.marquee-layer.front .marquee-row.line-1 {
+  visibility: hidden;
+}
+.marquee-row {
+  display: flex;
+  white-space: pre;
+  overflow: hidden;
+  width: 100%;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 0;
+  font-size: clamp(80px, 15vw, 220px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  will-change: transform;
+}
+/* Durations preserve the old px/s speed after the tracks were cut from
+   8/4 copies to 2 (a -50% loop spans one copy width, so duration scales
+   with copy count: line-1 120s × 2/8 = 30s, line-2 120s × 2/4 = 60s). */
+.marquee-row.line-1 .marquee-track {
+  animation: scroll-left 30s linear infinite;
+}
+.marquee-row.line-2 .marquee-track {
+  animation: scroll-left 60s linear infinite;
+}
+.marquee-row.line-1 .marquee-track.reverse {
+  animation: scroll-right 30s linear infinite;
+}
+.marquee-row.line-2 .marquee-track.reverse {
+  animation: scroll-right 60s linear infinite;
+}
+.marquee-word {
+  padding: 0 0.4em;
+  display: inline-block;
+}
+@media (max-width: 768px) {
+  .top-fade { height: 130px; }
+  .marquee-layer.front {
+    -webkit-mask-image: radial-gradient(ellipse 45% 90% at 50% 70%,
+      transparent 0%, transparent 30%, rgba(0,0,0,0.55) 60%, black 85%);
+    mask-image: radial-gradient(ellipse 45% 90% at 50% 70%,
+      transparent 0%, transparent 30%, rgba(0,0,0,0.55) 60%, black 85%);
+  }
+  .stage-spotlight {
+    background:
+      radial-gradient(ellipse 55% 60% at 50% 48%,
+        rgba(255, 250, 240, 0.7) 0%,
+        rgba(255, 250, 240, 0.35) 35%,
+        rgba(255, 250, 240, 0) 70%);
+  }
+}
+
+/* ── Dark theme — deep purple-ink stage matching MobileHero ───────── */
+.dark .hero-container {
+  background:
+    radial-gradient(ellipse 80% 65% at 50% 48%,
+      #1d172d 0%,
+      #141021 40%,
+      #0b0914 75%,
+      #07060f 100%);
+}
+.dark .wave-bg {
+  color: #322a4c;
+  opacity: 0.35;
+}
+.dark .stage-spotlight {
+  /* cool violet key light instead of the warm cream halo */
+  background:
+    radial-gradient(ellipse 38% 55% at 50% 48%,
+      rgba(167, 139, 250, 0.3) 0%,
+      rgba(167, 139, 250, 0.12) 35%,
+      rgba(167, 139, 250, 0) 70%);
+}
+.dark .marquee-layer.back {
+  color: #38304f;
+  opacity: 0.75;
+}
+.dark .marquee-layer.front {
+  color: #ece9f7;
+  text-shadow: 0 0 32px rgba(167, 139, 250, 0.3);
+}
+.dark .vignette {
+  background:
+    radial-gradient(ellipse 90% 95% at 50% 50%,
+      transparent 55%,
+      rgba(0, 0, 0, 0.18) 80%,
+      rgba(0, 0, 0, 0.42) 100%);
+}
+.dark .top-fade {
+  background: linear-gradient(to bottom,
+    rgba(7, 6, 15, 0.95) 0%,
+    rgba(7, 6, 15, 0.7) 35%,
+    rgba(7, 6, 15, 0.3) 70%,
+    transparent 100%);
+}
+.dark .grain {
+  mix-blend-mode: screen;
+  opacity: 0.05;
+}
+
+/* Per-route enter animation (see PageTransition). CSS-only on purpose: the
+   element's resting state is fully visible (opacity 1), so a navigated page can
+   never get stuck invisible the way AnimatePresence mode="wait" could. */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.page-enter {
+  animation: page-enter 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
