@@ -159,21 +159,21 @@ const curlForceShader = `
 `;
 
 export class FluidSimulation {
-    private renderer: THREE.WebGLRenderer;
-    private scene: THREE.Scene;
-    private camera: THREE.Camera;
+    private readonly renderer: THREE.WebGLRenderer;
+    private readonly scene: THREE.Scene;
+    private readonly camera: THREE.Camera;
 
     private velocity!: DoubleBuffer;
     private density!: DoubleBuffer;
     private pressure!: DoubleBuffer;
     private divergence!: THREE.WebGLRenderTarget;
 
-    private mesh: THREE.Mesh;
-    private materials: Record<string, THREE.ShaderMaterial> = {};
+    private readonly mesh: THREE.Mesh;
+    private readonly materials: Record<string, THREE.ShaderMaterial> = {};
 
     private simWidth = 0;
     private simHeight = 0;
-    private texelSize = new THREE.Vector2();
+    private readonly texelSize = new THREE.Vector2();
     private aspect = 1;
 
     constructor(renderer: THREE.WebGLRenderer, width: number, height: number) {
@@ -190,7 +190,7 @@ export class FluidSimulation {
 
     // Half floats match the reference and keep linear filtering core WebGL2
     // (full floats would need OES_texture_float_linear and double bandwidth).
-    private targetParams = {
+    private readonly targetParams = {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
         format: THREE.RGBAFormat,

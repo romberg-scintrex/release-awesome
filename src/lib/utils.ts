@@ -12,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
  * Always use this instead of bare JSON.stringify with dangerouslySetInnerHTML.
  */
 export function jsonLdHtml(data: unknown): string {
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+  return JSON.stringify(data).replaceAll("<", String.raw`\u003c`);
 }
 
 export const TEXT_LINE1 = "GREGORIUS DIMAS A YUDHANA";

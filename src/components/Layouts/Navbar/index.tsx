@@ -136,7 +136,7 @@ export function Navbar() {
                 "transition-transform duration-200 hover:-translate-y-0.5",
               )}
             >
-              Let&apos;s talk
+              Let&apos;s talk{" "}
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 transition-transform duration-200 group-hover:rotate-45">
                 <ArrowUpRight size={12} />
               </span>

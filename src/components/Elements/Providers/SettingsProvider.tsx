@@ -9,10 +9,10 @@ const SettingsContext = createContext<SiteSettings | null>(null);
 export function SettingsProvider({
   value,
   children,
-}: {
+}: Readonly<{
   value: SiteSettings;
   children: ReactNode;
-}) {
+}>) {
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }
 

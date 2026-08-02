@@ -3,7 +3,7 @@ import { Mail, ArrowUpRight } from "lucide-react";
 import { GithubIcon, LinkedinIcon, FacebookIcon, InstagramIcon } from "@/components/Elements/Icons";
 import type { SiteSettings } from "@/lib/types";
 
-export function Footer({ settings }: { settings: SiteSettings }) {
+export function Footer({ settings }: Readonly<{ settings: SiteSettings }>) {
   const year = new Date().getFullYear();
 
   return (

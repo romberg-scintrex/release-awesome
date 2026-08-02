@@ -14,7 +14,7 @@ export default function NotFound() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="inline-flex items-center gap-2 rounded-full border border-ink-900/10 dark:border-white/15 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-500"
         >
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink-400" />
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink-400" />{" "}
           Page not found
         </motion.div>
 
