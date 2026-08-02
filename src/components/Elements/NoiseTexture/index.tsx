@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export function NoiseTexture({ className, opacity = 0.06 }: { className?: string; opacity?: number }) {
+export function NoiseTexture({ className, opacity = 0.06 }: Readonly<{ className?: string; opacity?: number }>) {
   return (
     <div
       aria-hidden

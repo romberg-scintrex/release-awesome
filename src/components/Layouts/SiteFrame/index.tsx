@@ -21,10 +21,10 @@ import type { SiteSettings } from "@/lib/types";
 export function SiteFrame({
   settings,
   children,
-}: {
+}: Readonly<{
   settings: SiteSettings;
   children: ReactNode;
-}) {
+}>) {
   const pathname = usePathname();
 
   if (pathname?.startsWith("/eta887")) {
