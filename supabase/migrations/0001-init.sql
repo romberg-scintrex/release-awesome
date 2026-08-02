@@ -59,7 +59,7 @@ create table if not exists public.site_settings (
   university       text not null default 'Universitas Brawijaya',
   location         text not null default 'Jakarta, Indonesia',
   email            text not null default 'dimas.yudhana@gmail.com',
-  description      text not null default 'Backend engineer (Go) and Frontend engineer (React, Next.js) with a passion for building scalable and modern web applications.',
+  description      text not null default 'Software engineer with a passion for building reliable, scalable and modern web applications.',
   social_github    text not null default 'https://github.com/dimasyudhana',
   social_linkedin  text not null default 'https://www.linkedin.com/in/gregorius-dimas-a-yudhana-820008251/',
   social_facebook  text not null default 'https://www.facebook.com/profile.php?id=100081008444052',
