@@ -11,9 +11,7 @@ export const revalidate = 60;
 
 export default async function Home() {
 
-  const [ settings ] = await Promise.all([
-    getSettings(),
-  ]);
+  const settings = await getSettings();
   
   const profilePageLd = {
     "@context": "https://schema.org",

@@ -24,7 +24,7 @@ const DARK_STAGE =
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-export function MobileHero({ className }: { className?: string }) {
+export function MobileHero({ className }: Readonly<{ className?: string }>) {
   const reduce = useReducedMotion();
   const settings = useSettings();
 

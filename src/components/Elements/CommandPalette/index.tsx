@@ -153,6 +153,50 @@ export function CommandPalette() {
 
   // Hotkeys
   useEffect(() => {
+    function trapFocus(e: KeyboardEvent) {
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const activeEl = document.activeElement as HTMLElement | null;
+      const isOutside = !activeEl || !panel.contains(activeEl);
+      const wrapForward = !e.shiftKey && activeEl === last;
+      const wrapBackward = e.shiftKey && activeEl === first;
+
+      if (isOutside || wrapForward) {
+        e.preventDefault();
+        first.focus();
+      } else if (wrapBackward) {
+        e.preventDefault();
+        last.focus();
+      }
+    }
+
+    function handleNavigationKey(e: KeyboardEvent) {
+      switch (e.key) {
+        case "Escape":
+          e.preventDefault();
+          close();
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          setActive((i) => Math.min(filtered.length - 1, i + 1));
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setActive((i) => Math.max(0, i - 1));
+          break;
+        case "Enter":
+          e.preventDefault();
+          filtered[active]?.perform();
+          break;
+      }
+    }
+
     function onKey(e: KeyboardEvent) {
       const isK = e.key === "k" || e.key === "K";
       if (isK && (e.metaKey || e.ctrlKey)) {
@@ -162,41 +206,10 @@ export function CommandPalette() {
       }
       if (!open) return;
       if (e.key === "Tab") {
-        // Trap focus within the dialog (aria-modal contract / WCAG 2.4.3).
-        const panel = panelRef.current;
-        if (!panel) return;
-        const focusables = panel.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])',
-        );
-        if (focusables.length === 0) return;
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        const activeEl = document.activeElement as HTMLElement | null;
-        if (!activeEl || !panel.contains(activeEl)) {
-          e.preventDefault();
-          first.focus();
-        } else if (e.shiftKey && activeEl === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && activeEl === last) {
-          e.preventDefault();
-          first.focus();
-        }
+        trapFocus(e);
         return;
       }
-      if (e.key === "Escape") {
-        e.preventDefault();
-        close();
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActive((i) => Math.min(filtered.length - 1, i + 1));
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActive((i) => Math.max(0, i - 1));
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        filtered[active]?.perform();
-      }
+      handleNavigationKey(e);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -211,9 +224,6 @@ export function CommandPalette() {
       lastFocused.current?.focus?.();
     }
   }, [open]);
-  useEffect(() => {
-    setActive(0);
-  }, [query]);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -264,7 +274,10 @@ export function CommandPalette() {
               <input
                 ref={inputRef}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActive(0);
+                }}
                 placeholder="Type a command or search…"
                 className="h-12 w-full bg-transparent text-sm placeholder:text-ink-400 focus:outline-none"
               />

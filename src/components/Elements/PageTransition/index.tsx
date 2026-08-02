@@ -15,7 +15,7 @@ import { type PropsWithChildren } from "react";
  * animation can't hang like that: the browser always runs it to completion, and
  * if it were ever stripped the content is still visible by default.
  */
-export function PageTransition({ children }: PropsWithChildren) {
+export function PageTransition({ children }: Readonly<PropsWithChildren>) {
   const pathname = usePathname();
   return (
     <div key={pathname} className="page-enter">
