@@ -1,0 +1,62 @@
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import path from "path";
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./src/__tests__/setup.ts"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov", "html"],
+      reportsDirectory: "./coverage",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.test.{ts,tsx}",
+        "src/**/*.spec.{ts,tsx}",
+        "src/__tests__/**",
+        "src/app/**/layout.tsx",
+        "src/app/**/page.tsx",
+        "src/app/**/not-found.tsx",
+        "src/app/**/opengraph-image.tsx",
+        "src/app/**/robots.ts",
+        "src/app/**/sitemap.ts",
+        "src/components/Elements/Icons/**",
+        "src/components/Elements/Providers/**",
+        "src/components/Elements/Reveal/**",
+        "src/components/Elements/RevealText/**",
+        "src/components/Elements/GradientMesh/**",
+        "src/components/Elements/Turnstile/**",
+        "src/components/Elements/Badge/**",
+        "src/components/Elements/Field/**",
+        "src/components/Fragments/MaskReveal/**",
+        "src/components/Fragments/HeroMobile/**",
+        "src/components/Fragments/HeroOverlay/**",
+        "src/components/Fragments/SectionHeading/**",
+        "src/components/Fragments/ContactInfo/**",
+        "src/components/Fragments/ContactForm/**",
+        "src/components/Elements/CustomCursor/**",
+        "src/components/Elements/ScrollSmooth/**",
+        "src/components/Elements/PageTransition/**",
+        "src/components/Elements/RouteProgress/**",
+        "src/components/Elements/ScrollTop/**",
+        "src/components/Layouts/**",
+        "src/lib/fluid-simulation/**",
+        "src/lib/admin/**",
+        "src/lib/supabase/**",
+        "src/lib/api/**",
+        "src/lib/types.ts",
+        "src/lib/default.ts",
+        "src/middleware.ts",
+      ],
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+});

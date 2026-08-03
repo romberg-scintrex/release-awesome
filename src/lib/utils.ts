@@ -5,6 +5,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function inputClasses(error: string | null) {
+  return cn(
+    "h-11 w-full rounded-xl border bg-white dark:bg-ink-800 px-4 text-sm",
+    "border-black/10 dark:border-white/10",
+    "placeholder:text-ink-400",
+    "focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/60",
+    "transition-colors",
+    error && "border-rose-400/60 focus:ring-rose-400/40",
+  );
+}
+
 /**
  * Serialize structured data for an inline <script type="application/ld+json">.
  * Escapes `<` to its unicode form so any content containing "</script>" (e.g.
@@ -17,7 +28,12 @@ export function jsonLdHtml(data: unknown): string {
 
 export const TEXT_LINE1 = "GREGORIUS DIMAS A YUDHANA";
 export const TEXT_LINE2 = "SOFTWARE ENGINEER  GOLANG  NEXTJS  POSTGRESQL  MICROSERVICES  DOCKER  KUBERNETES  AWS  GOOGLE CLOUD PLATFORM  AI ENTHUSIAST";
-export const ROLES = ["Software Engineer", "Golang Developer", "Next JS Developer", "AI Enthusiast"];
+
+export const ROLES = [
+  "Software Engineer", 
+  "Golang Developer", 
+  "Next JS Developer",
+];
 
 export const SITE = {
   name: "Gregorius Dimas A Yudhana",

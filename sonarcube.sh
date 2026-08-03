@@ -53,11 +53,48 @@ if [[ "$CHECK_ONLY" == false ]]; then
   echo "  Token        : ${SONAR_TOKEN:0:8}****"
   echo ""
 
+<<<<<<< Updated upstream
   # Generate coverage report if not exists or stale
   if [[ ! -f "$REPO_DIR/coverage.out" ]]; then
     echo ">> Generating coverage report first..."
     (cd "$REPO_DIR" && go test ./... -count=1 -coverprofile=coverage.out -covermode=atomic 2>/dev/null || true)
     echo ""
+=======
+  # Wait for SonarQube to be ready before proceeding
+  echo ">> Waiting for SonarQube to be ready..."
+  SONAR_READY=false
+  for i in $(seq 1 30); do
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SONAR_HOST/api/server/version" 2>/dev/null || echo "000")
+    if [[ "$HTTP_CODE" == "200" ]]; then
+      SONAR_READY=true
+      echo "   ✓ SonarQube is ready"
+      break
+    fi
+    echo -n "."
+    sleep 3
+  done
+  if [[ "$SONAR_READY" == false ]]; then
+    echo ""
+    echo "   ✗ SonarQube did not become ready within 90s"
+    echo "   Ensure container is running: docker ps --filter name=sonarqube"
+    exit 1
+  fi
+  echo ""
+
+  # Ensure project exists in SonarQube (create if not)
+  echo ">> Ensuring project exists in SonarQube..."
+  CREATE_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+    -u "$SONAR_TOKEN:" \
+    "$SONAR_HOST/api/projects/create" \
+    -d "project=$PROJECT_KEY&name=$(grep -m1 '^sonar.projectName=' "$REPO_DIR/sonar-project.properties" | cut -d'=' -f2)" 2>/dev/null || true)
+
+  if [[ "$CREATE_RESPONSE" == "200" ]]; then
+    echo "   ✓ Project created"
+  elif [[ "$CREATE_RESPONSE" == "400" ]]; then
+    echo "   ✓ Project already exists"
+  else
+    echo "   ⚠ Could not verify project (HTTP $CREATE_RESPONSE) — continuing anyway"
+>>>>>>> Stashed changes
   fi
 
   # Run SonarQube Scanner
