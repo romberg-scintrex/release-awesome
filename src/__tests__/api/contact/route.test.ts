@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { POST } from "./route";
+import { POST } from "@/app/api/contact/route";
 
 // Mock Resend as a class
 const mockSend = vi.fn().mockResolvedValue({ error: null });
