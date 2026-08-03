@@ -30,7 +30,6 @@ if [[ -z "${SONAR_TOKEN:-}" ]]; then
 fi
 
 SONAR_HOST="${SONAR_HOST_URL:-http://localhost:9000}"
-# Read project key from sonar-project.properties
 PROJECT_KEY=$(grep -m1 '^sonar.projectKey=' "$(dirname "$0")/sonar-project.properties" | cut -d'=' -f2)
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 CHECK_ONLY=false
@@ -59,6 +58,27 @@ if [[ "$CHECK_ONLY" == false ]]; then
   SONAR_HOST_DOCKER="${SONAR_HOST_DOCKER/127.0.0.1/host.docker.internal}"
 
   echo ">> Host (docker): $SONAR_HOST_DOCKER"
+  echo ""
+
+  # Wait for SonarQube to be ready before proceeding
+  echo ">> Waiting for SonarQube to be ready..."
+  SONAR_READY=false
+  for i in $(seq 1 30); do
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SONAR_HOST/api/server/version" 2>/dev/null || echo "000")
+    if [[ "$HTTP_CODE" == "200" ]]; then
+      SONAR_READY=true
+      echo "   ✓ SonarQube is ready"
+      break
+    fi
+    echo -n "."
+    sleep 3
+  done
+  if [[ "$SONAR_READY" == false ]]; then
+    echo ""
+    echo "   ✗ SonarQube did not become ready within 90s"
+    echo "   Ensure container is running: docker ps --filter name=sonarqube"
+    exit 1
+  fi
   echo ""
 
   # Ensure project exists in SonarQube (create if not)
@@ -124,7 +144,6 @@ fi
 # PHASE 2: QUALITY CHECK
 # ════════════════════════════════════════════════
 
-# Quality targets (adjusted for TypeScript/Next.js)
 TARGET_COVERAGE=50
 TARGET_BUGS=0
 TARGET_VULNERABILITIES=0
@@ -136,7 +155,6 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🔍 SonarQube Quality Check"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# ── Fetch metrics ──
 echo ""
 echo ">> Fetching project metrics..."
 METRICS_JSON=$(curl -s -u "$SONAR_TOKEN:" \
@@ -149,7 +167,6 @@ if ! echo "$METRICS_JSON" | python3 -c "import sys,json; json.load(sys.stdin)" 2
   exit 1
 fi
 
-# Parse all metrics
 read -r COVERAGE BUGS VULNS SMELLS DUPLICATION NCLOC COGNITIVE DEBT < <(echo "$METRICS_JSON" | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
@@ -166,7 +183,6 @@ print(
 )
 ")
 
-# ── Fetch Quality Gate status ──
 echo ">> Fetching quality gate status..."
 QG_JSON=$(curl -s -u "$SONAR_TOKEN:" \
   "$SONAR_HOST/api/qualitygates/project_status?projectKey=$PROJECT_KEY")
@@ -185,7 +201,6 @@ for c in data.get('projectStatus', {}).get('conditions', []):
     print(f\"   {icon} {c['metricKey']}: {c['actualValue']} (threshold: {c['comparator']} {c['errorThreshold']})\")
 " 2>/dev/null || echo "   (no conditions available)")
 
-# ── Fetch critical/blocker issues ──
 echo ">> Fetching critical/blocker issues..."
 ISSUES_JSON=$(curl -s -u "$SONAR_TOKEN:" \
   "$SONAR_HOST/api/issues/search?componentKeys=$PROJECT_KEY&severities=CRITICAL,BLOCKER&ps=50&statuses=OPEN,CONFIRMED,REOPENED")
@@ -209,7 +224,6 @@ if data.get('total', 0) == 0:
     print('   (none)')
 " 2>/dev/null || echo "   (fetch failed)")
 
-# ── Display results ──
 echo ""
 echo "┌──────────────────────────────────────────────┐"
 echo "│           📊 METRICS SUMMARY                 │"
@@ -234,7 +248,6 @@ echo ""
 echo "🚨 Critical/Blocker Issues:"
 echo "$ISSUES_DETAIL"
 
-# ── Evaluate against targets ──
 echo ""
 FAILURES=0
 FAILURE_LIST=""

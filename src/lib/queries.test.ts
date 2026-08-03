@@ -293,19 +293,19 @@ describe("Async query functions (isSupabaseConfigured=false)", () => {
 
   it("getProjects returns published seed projects", async () => {
     const result = await getProjects();
-    expect(result.length).toBe(1);
+    expect(result).toHaveLength(1);
     expect(result[0].slug).toBe("test");
   });
 
   it("getFeaturedProjects returns featured published projects", async () => {
     const result = await getFeaturedProjects();
-    expect(result.length).toBe(1);
+    expect(result).toHaveLength(1);
     expect(result[0].featured).toBe(true);
   });
 
   it("getFeaturedProjects respects limit", async () => {
     const result = await getFeaturedProjects(0);
-    expect(result.length).toBe(0);
+    expect(result).toHaveLength(0);
   });
 
   it("getProjectBySlug returns matching published seed project", async () => {
@@ -326,7 +326,7 @@ describe("Async query functions (isSupabaseConfigured=false)", () => {
 
   it("getTestimonials returns published seed testimonials", async () => {
     const result = await getTestimonials();
-    expect(result.length).toBe(1);
+    expect(result).toHaveLength(1);
     expect(result[0].quote).toBe("Great");
   });
 
