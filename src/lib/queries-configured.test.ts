@@ -107,7 +107,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getProjects } = await import("./queries");
       const result = await getProjects();
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].slug).toBe("proj");
       expect(result[0].shortDescription).toBe("Short");
     });
@@ -121,7 +121,7 @@ describe("queries with isSupabaseConfigured=true", () => {
       const { getProjects } = await import("./queries");
       const result = await getProjects();
       // Falls back to published seedProjects
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].slug).toBe("test");
     });
   });
@@ -168,7 +168,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getTestimonials } = await import("./queries");
       const result = await getTestimonials();
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].quote).toBe("DB Quote");
     });
 
@@ -180,7 +180,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getTestimonials } = await import("./queries");
       const result = await getTestimonials();
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
     });
   });
 
@@ -193,7 +193,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getPosts } = await import("./queries");
       const result = await getPosts();
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].slug).toBe("hello");
     });
 
@@ -243,7 +243,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getTools } = await import("./queries");
       const result = await getTools();
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].slug).toBe("my-tool");
     });
 
@@ -297,7 +297,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getFeaturedTools } = await import("./queries");
       const result = await getFeaturedTools(1);
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].featured).toBe(true);
     });
   });
@@ -314,7 +314,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getFeaturedPosts } = await import("./queries");
       const result = await getFeaturedPosts(1);
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].featured).toBe(true);
     });
   });
@@ -331,7 +331,7 @@ describe("queries with isSupabaseConfigured=true", () => {
 
       const { getFeaturedProjects } = await import("./queries");
       const result = await getFeaturedProjects(1);
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].featured).toBe(true);
     });
   });
