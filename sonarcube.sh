@@ -30,7 +30,6 @@ if [[ -z "${SONAR_TOKEN:-}" ]]; then
 fi
 
 SONAR_HOST="${SONAR_HOST_URL:-http://localhost:9000}"
-# Read project key from sonar-project.properties
 PROJECT_KEY=$(grep -m1 '^sonar.projectKey=' "$(dirname "$0")/sonar-project.properties" | cut -d'=' -f2)
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 CHECK_ONLY=false
@@ -61,11 +60,6 @@ if [[ "$CHECK_ONLY" == false ]]; then
   echo ">> Host (docker): $SONAR_HOST_DOCKER"
   echo ""
 
-  # Generate coverage report if not exists or stale
-  if [[ ! -f "$REPO_DIR/coverage.out" ]]; then
-    echo ">> Generating coverage report first..."
-    (cd "$REPO_DIR" && go test ./... -count=1 -coverprofile=coverage.out -covermode=atomic 2>/dev/null || true)
-    echo ""
   # Wait for SonarQube to be ready before proceeding
   echo ">> Waiting for SonarQube to be ready..."
   SONAR_READY=false
@@ -93,14 +87,6 @@ if [[ "$CHECK_ONLY" == false ]]; then
     -u "$SONAR_TOKEN:" \
     "$SONAR_HOST/api/projects/create" \
     -d "project=$PROJECT_KEY&name=$(grep -m1 '^sonar.projectName=' "$REPO_DIR/sonar-project.properties" | cut -d'=' -f2)" 2>/dev/null || true)
-
-  if [[ "$CREATE_RESPONSE" == "200" ]]; then
-    echo "   ✓ Project created"
-  elif [[ "$CREATE_RESPONSE" == "400" ]]; then
-    echo "   ✓ Project already exists"
-  else
-    echo "   ⚠ Could not verify project (HTTP $CREATE_RESPONSE) — continuing anyway"
-  fi
 
   if [[ "$CREATE_RESPONSE" == "200" ]]; then
     echo "   ✓ Project created"
@@ -158,7 +144,6 @@ fi
 # PHASE 2: QUALITY CHECK
 # ════════════════════════════════════════════════
 
-# Quality targets (adjusted for TypeScript/Next.js)
 TARGET_COVERAGE=50
 TARGET_BUGS=0
 TARGET_VULNERABILITIES=0
@@ -170,7 +155,6 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🔍 SonarQube Quality Check"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# ── Fetch metrics ──
 echo ""
 echo ">> Fetching project metrics..."
 METRICS_JSON=$(curl -s -u "$SONAR_TOKEN:" \
@@ -183,7 +167,6 @@ if ! echo "$METRICS_JSON" | python3 -c "import sys,json; json.load(sys.stdin)" 2
   exit 1
 fi
 
-# Parse all metrics
 read -r COVERAGE BUGS VULNS SMELLS DUPLICATION NCLOC COGNITIVE DEBT < <(echo "$METRICS_JSON" | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
@@ -200,7 +183,6 @@ print(
 )
 ")
 
-# ── Fetch Quality Gate status ──
 echo ">> Fetching quality gate status..."
 QG_JSON=$(curl -s -u "$SONAR_TOKEN:" \
   "$SONAR_HOST/api/qualitygates/project_status?projectKey=$PROJECT_KEY")
@@ -219,7 +201,6 @@ for c in data.get('projectStatus', {}).get('conditions', []):
     print(f\"   {icon} {c['metricKey']}: {c['actualValue']} (threshold: {c['comparator']} {c['errorThreshold']})\")
 " 2>/dev/null || echo "   (no conditions available)")
 
-# ── Fetch critical/blocker issues ──
 echo ">> Fetching critical/blocker issues..."
 ISSUES_JSON=$(curl -s -u "$SONAR_TOKEN:" \
   "$SONAR_HOST/api/issues/search?componentKeys=$PROJECT_KEY&severities=CRITICAL,BLOCKER&ps=50&statuses=OPEN,CONFIRMED,REOPENED")
@@ -243,7 +224,6 @@ if data.get('total', 0) == 0:
     print('   (none)')
 " 2>/dev/null || echo "   (fetch failed)")
 
-# ── Display results ──
 echo ""
 echo "┌──────────────────────────────────────────────┐"
 echo "│           📊 METRICS SUMMARY                 │"
@@ -268,7 +248,6 @@ echo ""
 echo "🚨 Critical/Blocker Issues:"
 echo "$ISSUES_DETAIL"
 
-# ── Evaluate against targets ──
 echo ""
 FAILURES=0
 FAILURE_LIST=""

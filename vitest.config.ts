@@ -26,7 +26,6 @@ export default defineConfig({
         "src/app/**/sitemap.ts",
         "src/components/Elements/Icons/**",
         "src/components/Elements/Providers/**",
-<<<<<<< HEAD
         "src/components/Elements/Reveal/**",
         "src/components/Elements/RevealText/**",
         "src/components/Elements/GradientMesh/**",
@@ -39,11 +38,9 @@ export default defineConfig({
         "src/components/Fragments/SectionHeading/**",
         "src/components/Fragments/ContactInfo/**",
         "src/components/Fragments/ContactForm/**",
-=======
         "src/components/Fragments/MaskReveal/**",
         "src/components/Fragments/HeroMobile/**",
         "src/components/Fragments/HeroOverlay/**",
->>>>>>> 898d361ef0bbae3fc682bcb5464f4616c029a061
         "src/components/Elements/CustomCursor/**",
         "src/components/Elements/ScrollSmooth/**",
         "src/components/Elements/PageTransition/**",
