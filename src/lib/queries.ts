@@ -2,9 +2,8 @@ import { cache } from "react";
 import { SITE } from "@/lib/utils";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from "@/lib/supabase/config";
-import type { SiteSettings, Testimonial, Post, Tool, ToolKind, Stat } from "@/lib/types";
+import type { SiteSettings, Testimonial, Post, Tool, ToolKind, Stat, GalleryItem, Project, ProjectCategory } from "@/lib/types";
 import { defaultStats, seedProjects, seedTestimonials } from "@/lib/default";
-import type { GalleryItem, Project, ProjectCategory } from "@/lib/types";
 
 export const defaultSettings: SiteSettings = {
   name: SITE.name,

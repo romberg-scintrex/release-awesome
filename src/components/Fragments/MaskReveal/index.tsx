@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type * as THREE from 'three';
 import type { FluidSimulation } from '@/lib/fluid-simulation/FluidSimulation';
 import { useSettings } from '@/components/Elements/Providers/SettingsProvider';
@@ -325,7 +325,7 @@ const MaskRevealHero = () => {
         // stale one can freeze `visible` at the wrong value.
         const io = new IntersectionObserver(
             (entries) => {
-                visible = entries[entries.length - 1].isIntersecting;
+                visible = entries.at(-1)!.isIntersecting;
                 if (!visible) {
                     pointerActive = false;
                     progressTarget = 0;
@@ -485,16 +485,16 @@ const MaskRevealHero = () => {
     );
 };
 
-const MarqueeTrack = ({ text, reverse = false }: { text: string, reverse?: boolean }) => {
+const MarqueeTrack = ({ text, reverse = false }: Readonly<{ text: string, reverse?: boolean }>) => {
     // 2 copies is the minimum for a seamless -50% translate loop. More copies
     // multiply the composited layer width (8 copies of 220px text ≈ a
     // 40,000px-wide GPU layer per track, ×4 tracks) and jank the compositor;
     // the loop speed is kept by per-row durations in globals.css.
-    const words = Array(2).fill(text);
+    const words = new Array(2).fill(text) as string[];
     return (
         <div className={`marquee-track ${reverse ? 'reverse' : ''}`}>
             {words.map((w, i) => (
-                <span key={i} className="marquee-word">
+                <span key={`marquee-${reverse ? 'r' : 'f'}-${i}`} className="marquee-word">
                     {w}
                 </span>
             ))}

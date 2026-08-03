@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -13,14 +13,18 @@ export function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
   const [variant, setVariant] = useState<"default" | "hover" | "view" | "text">("default");
   const [label, setLabel] = useState<string>("");
+  const activatedRef = useRef(false);
 
   useEffect(() => {
     const isTouch = window.matchMedia("(hover: none)").matches;
     const isFinePointer = window.matchMedia("(pointer: fine)").matches;
     if (isTouch || !isFinePointer) return;
-    setEnabled(true);
 
     function onMove(e: MouseEvent) {
+      if (!activatedRef.current) {
+        activatedRef.current = true;
+        setEnabled(true);
+      }
       x.set(e.clientX);
       y.set(e.clientY);
 
@@ -57,30 +61,38 @@ export function CustomCursor() {
 
   if (!enabled) return null;
 
+  const cursorSize = (() => {
+    switch (variant) {
+      case "view": return { width: 72, height: 72 };
+      case "hover": return { width: 44, height: 44 };
+      case "text": return { width: 4, height: 28 };
+      default: return { width: 10, height: 10 };
+    }
+  })();
+  const borderRadius = variant === "text" ? 2 : 999;
+
   return (
-    <>
+    <motion.div
+      aria-hidden
+      style={{ x: sx, y: sy }}
+      className="pointer-events-none fixed left-0 top-0 z-[9999] hide-on-touch"
+    >
       <motion.div
-        aria-hidden
-        style={{ x: sx, y: sy }}
-        className="pointer-events-none fixed left-0 top-0 z-[9999] hide-on-touch"
+        animate={{
+          width: cursorSize.width,
+          height: cursorSize.height,
+          borderRadius,
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        className={cn(
+          "-translate-x-1/2 -translate-y-1/2 flex items-center justify-center",
+          "border border-white mix-blend-difference bg-white/10 backdrop-blur-sm",
+        )}
       >
-        <motion.div
-          animate={{
-            width: variant === "view" ? 72 : variant === "hover" ? 44 : variant === "text" ? 4 : 10,
-            height: variant === "view" ? 72 : variant === "hover" ? 44 : variant === "text" ? 28 : 10,
-            borderRadius: variant === "text" ? 2 : 999,
-          }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className={cn(
-            "-translate-x-1/2 -translate-y-1/2 flex items-center justify-center",
-            "border border-white mix-blend-difference bg-white/10 backdrop-blur-sm",
-          )}
-        >
-          {label && (
-            <span className="text-[10px] font-semibold tracking-widest text-white">{label}</span>
-          )}
-        </motion.div>
+        {label && (
+          <span className="text-[10px] font-semibold tracking-widest text-white">{label}</span>
+        )}
       </motion.div>
-    </>
+    </motion.div>
   );
 }
