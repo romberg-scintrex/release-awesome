@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { HeroSection } from "@/components/Layouts/HeroSection";
+import { MarqueeTech } from "@/components/Layouts/MarqueeTech";
 import { SITE, jsonLdHtml } from "@/lib/utils";
 import { getSettings } from "@/lib/queries";
 
@@ -49,6 +50,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(profilePageLd) }}
       />
       <HeroSection />
+      <MarqueeTech />
     </>
   );
 }

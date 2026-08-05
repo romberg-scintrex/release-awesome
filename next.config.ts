@@ -10,8 +10,9 @@ const csp = [
   "script-src 'self' 'unsafe-inline' challenges.cloudflare.com",
   // Tailwind and framer-motion both write inline styles.
   "style-src 'self' 'unsafe-inline'",
-  // Supabase media, placeholder images used in dev/demo, data/blob for WebGL.
-  "img-src 'self' data: blob: *.supabase.co picsum.photos images.unsplash.com",
+  // Supabase media, placeholder images used in dev/demo, data/blob for WebGL,
+  // and third-party free tech logo assets used in the marquee.
+  "img-src 'self' data: blob: *.supabase.co picsum.photos images.unsplash.com cdn.simpleicons.org",
   // Supabase REST + realtime (wss), own API routes.
   "connect-src 'self' *.supabase.co wss://*.supabase.co",
   // Turnstile renders in an iframe.
@@ -28,6 +29,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "cdn.simpleicons.org" },
+      { protocol: "https", hostname: "upload.wikimedia.org" },
     ],
   },
   async headers() {
