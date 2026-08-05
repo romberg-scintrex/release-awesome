@@ -113,7 +113,7 @@ export function MobileHero({ className }: Readonly<{ className?: string }>) {
           alt={`${settings.name} - ${settings.role}`}
           fill
           priority
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, 768px"
           className="object-cover [filter:contrast(1.05)_saturate(1.04)] drop-shadow-[0_30px_44px_rgba(18,10,38,0.42)]"
           style={{ objectPosition: "40% 6%" }}
         />
