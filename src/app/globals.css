@@ -528,6 +528,9 @@ html.lenis body {
   padding: 0 0.4em;
   display: inline-block;
 }
+.animate-marquee {
+  animation: scroll-left var(--marquee-duration, 30s) linear infinite;
+}
 @media (max-width: 768px) {
   .top-fade { height: 130px; }
   .marquee-layer.front {

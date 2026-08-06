@@ -6,57 +6,57 @@ import { useEffect, useRef, useState } from "react";
 
 const techMarquee = [
   {
-    image: "https://cdn.simpleicons.org/go/000000",
+    image: "https://cdn.simpleicons.org/go",
     description: "Go",
     detail: "Enterprise-grade backend language used for scalable services.",
   },
   {
-    image: "https://cdn.simpleicons.org/typescript/3178C6",
+    image: "https://cdn.simpleicons.org/typescript",
     description: "TypeScript",
     detail: "Typed JavaScript that improves large application maintainability.",
   },
   {
-    image: "https://cdn.simpleicons.org/javascript/F7DF1E",
+    image: "https://cdn.simpleicons.org/javascript",
     description: "JavaScript",
     detail: "Core language for the web, tooling, and interactive experiences.",
   },
   {
-    image: "https://cdn.simpleicons.org/nodedotjs/000000",
+    image: "https://cdn.simpleicons.org/nodedotjs",
     description: "Node.js",
     detail: "JavaScript runtime for fast server-side and tooling workflows.",
   },
   {
-    image: "https://cdn.simpleicons.org/nextdotjs/000000",
-    description: "Next.js",
-    detail: "React framework for routing, rendering, and full-stack delivery.",
-  },
-  {
-    image: "https://cdn.simpleicons.org/react/000000",
+    image: "https://cdn.simpleicons.org/react",
     description: "React",
     detail: "Frontend library for building interactive UI components.",
   },
   {
-    image: "https://cdn.simpleicons.org/postgresql/4169E1",
+    image: "https://cdn.simpleicons.org/nextdotjs",
+    description: "Next.js",
+    detail: "React framework for routing, rendering, and full-stack delivery.",
+  },
+  {
+    image: "https://cdn.simpleicons.org/postgresql",
     description: "PostgreSQL",
     detail: "Powerful relational database with reliable ACID semantics.",
   },
   {
-    image: "https://cdn.simpleicons.org/mongodb/47A248",
+    image: "https://cdn.simpleicons.org/mongodb",
     description: "MongoDB",
     detail: "Document database built for flexible, scalable data models.",
   },
   {
-    image: "https://cdn.simpleicons.org/redis/DC382D",
+    image: "https://cdn.simpleicons.org/redis",
     description: "Redis",
     detail: "In-memory store for cache, session, and pub/sub patterns.",
   },
   {
-    image: "https://cdn.simpleicons.org/docker/2496ED",
+    image: "https://cdn.simpleicons.org/docker",
     description: "Docker",
     detail: "Container platform for portable application packaging.",
   },
   {
-    image: "https://cdn.simpleicons.org/kubernetes/326CE5",
+    image: "https://cdn.simpleicons.org/kubernetes",
     description: "Kubernetes",
     detail: "Orchestration system for managing container workloads.",
   },
@@ -66,17 +66,17 @@ const techMarquee = [
     detail: "Cloud platform for infrastructure, storage, and managed services.",
   },
   {
-    image: "https://cdn.simpleicons.org/apachekafka/231F20",
+    image: "https://cdn.simpleicons.org/apachekafka",
     description: "Kafka",
     detail: "Distributed event streaming backbone for real-time systems.",
   },
   {
-    image: "https://cdn.simpleicons.org/git/F05032",
+    image: "https://cdn.simpleicons.org/git",
     description: "Git",
     detail: "Version control system for change tracking and collaboration.",
   },
   {
-    image: "https://cdn.simpleicons.org/githubactions/2088FF",
+    image: "https://cdn.simpleicons.org/githubactions",
     description: "CI / CD",
     detail: "Automated delivery pipeline for continuous integration and deployment.",
   },
@@ -136,6 +136,7 @@ export function MarqueeTech() {
         <div
           aria-hidden
           className="flex w-max items-center gap-8 whitespace-nowrap px-4 animate-marquee"
+          style={{ "--marquee-duration": "120s" } as React.CSSProperties}
           onPointerEnter={() => {
             isHoveringRef.current = true;
           }}
@@ -156,7 +157,9 @@ export function MarqueeTech() {
                 <motion.div
                   layout
                   whileHover={{ y: -2, scale: 1.01 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 24 }}                  data-tech-index={i}                  className="relative flex h-24 w-24 items-center justify-center rounded-[2rem] border border-black/5 bg-white/80 shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:border-white/10 dark:bg-white/[0.05]"
+                  transition={{ type: "spring", stiffness: 300, damping: 24 }}                  
+                  data-tech-index={i}                  
+                  className="relative flex h-20 w-20 items-center justify-center rounded-[2rem] border border-black/5 bg-white/80 shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:border-white/10 dark:bg-white/[0.05]"
                   onPointerEnter={() => setActiveIndex(i)}
                   onPointerMove={() => setActiveIndex(i)}
                   onPointerLeave={() => setActiveIndex(null)}
@@ -172,10 +175,10 @@ export function MarqueeTech() {
                   <Image
                     src={label.image}
                     alt={label.description}
-                    width={54}
-                    height={54}
+                    width={48}
+                    height={48}
                     unoptimized
-                    className="relative z-10 h-14 w-14 object-contain transition-transform duration-300 ease-out"
+                    className="relative z-10 h-12 w-12 object-contain transition-transform duration-300 ease-out"
                     loading="lazy"
                     decoding="async"
                   />
