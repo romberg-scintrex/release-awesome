@@ -11,7 +11,7 @@ interface SectionHeadingProps {
   align?: "left" | "center";
   className?: string;
   /** Heading level for the title. Page-lead headings should be "h1"; defaults to "h2". */
-  as?: "h1" | "h2";
+  as?: "h1" | "h2" | "h3";
 }
 
 export function SectionHeading({
