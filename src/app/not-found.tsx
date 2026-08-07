@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Command } from "lucide-react";
 
 export default function NotFound() {
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith("/admin");
+
+  const backHref = isAdmin ? "/admin" : "/";
+  const backLabel = isAdmin ? "Back to Dashboard" : "Back to Home";
+
   return (
     <section className="relative isolate min-h-screen overflow-hidden flex items-center">
       <div className="container relative pt-32 pb-24 text-center">
@@ -34,11 +41,17 @@ export default function NotFound() {
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="mx-auto mt-6 max-w-md text-base sm:text-lg text-ink-500 dark:text-ink-300"
         >
-          The page you&apos;re looking for doesn&apos;t exist yet. It&apos;s coming soon! For now, head back home or use{" "}
-          <kbd className="inline-flex items-center gap-1 rounded-md border border-black/10 dark:border-white/15 bg-white/60 dark:bg-white/5 px-1.5 py-0.5 text-[11px] font-mono text-ink-700 dark:text-ink-100">
-            <Command size={11} />K
-          </kbd>{" "}
-          to navigate.
+          {isAdmin ? (
+            <>The admin page you&apos;re looking for doesn&apos;t exist.</>
+          ) : (
+            <>
+              The page you&apos;re looking for doesn&apos;t exist yet. It&apos;s coming soon! For now, head back home or use{" "}
+              <kbd className="inline-flex items-center gap-1 rounded-md border border-black/10 dark:border-white/15 bg-white/60 dark:bg-white/5 px-1.5 py-0.5 text-[11px] font-mono text-ink-700 dark:text-ink-100">
+                <Command size={11} />K
+              </kbd>{" "}
+              to navigate.
+            </>
+          )}
         </motion.p>
 
         <motion.div
@@ -48,11 +61,11 @@ export default function NotFound() {
           className="mt-10"
         >
           <Link
-            href="/"
+            href={backHref}
             className="inline-flex items-center gap-2 rounded-full bg-ink-900 dark:bg-white px-6 py-3 text-sm font-medium text-white dark:text-ink-900 transition-colors hover:bg-ink-700 dark:hover:bg-ink-100"
           >
             <ArrowLeft size={16} />
-            Back to Home
+            {backLabel}
           </Link>
         </motion.div>
       </div>
