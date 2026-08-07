@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import { HeroSection } from "@/components/Layouts/HeroSection";
 import { MarqueeTech } from "@/components/Layouts/MarqueeTech";
+import { Testimonials } from "@/components/Layouts/Testimonials";
 import { SITE, jsonLdHtml } from "@/lib/utils";
-import { getSettings } from "@/lib/queries";
+import { getSettings, getTestimonials } from "@/lib/queries";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -12,7 +13,10 @@ export const revalidate = 60;
 
 export default async function Home() {
 
-  const settings = await getSettings();
+    const [ settings, testimonials ] = await Promise.all([
+    getSettings(),
+    getTestimonials(),
+  ]);
   
   const profilePageLd = {
     "@context": "https://schema.org",
@@ -51,6 +55,7 @@ export default async function Home() {
       />
       <HeroSection />
       <MarqueeTech />
+      <Testimonials testimonials={testimonials} />
     </>
   );
 }

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link"
 import { ExternalLink, LogOut } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { NavbarAdmin } from "@/components/Layouts/NavbarAdmin";
+import { NavbarAdmin } from "@/components/Layouts/AdminNavbar";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./action";
 
