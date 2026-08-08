@@ -11,6 +11,20 @@ export interface GalleryItem {
   caption?: string;
 }
 
+export interface SlideItem {
+  id: string;
+  /** Background image. Ignored if `video` is provided. */
+  image?: string;
+  /** Background video (mp4). Autoplays muted + looped when active. */
+  video?: string;
+  /** Poster frame shown while the video loads. */
+  poster?: string;
+  title: string;
+  description?: string;
+  href?: string;
+  ctaLabel?: string;
+}
+
 export interface Project {
   id: string;
   slug: string;

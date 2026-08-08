@@ -13,7 +13,7 @@ import {
     type LucideIcon,
 } from 'lucide-react'
 
-import type { Project, Testimonial, Stat } from "@/lib/types";
+import type { Project, Testimonial, Stat, SlideItem } from "@/lib/types";
 
 // Re-export the shared types so existing imports (`@/lib/data`) keep working.
 export type { Project, ProjectCategory, Testimonial, GalleryItem, Stat } from "@/lib/types";
@@ -500,4 +500,55 @@ export const topSkills: string[] = [
   "PostgreSQL",
   "Docker",
   "Kubernetes",
+];
+
+/**
+ * Fallback data for <SlideDesktop/> when `settings.Slides` from
+ * the CMS is empty/undefined. Files must live in `public/videos/`.
+ * Next.js serves anything in `public/` from the root — so the file at
+ * `public/videos/video0001.mp4` is requested as `/videos/video0001.mp4`,
+ * WITHOUT the `/public` prefix.
+ * Titles/descriptions are placeholder copy too; replace with your own.
+ */
+export const defaultSlides: SlideItem[] = [
+  {
+    id: "1",
+    video: "/videos/video0001.mp4",
+    title: "Kategori Satu",
+    description: "Deskripsi singkat untuk kategori pertama — ganti dengan konten kamu.",
+    href: "/kategori/satu",
+    ctaLabel: "Selengkapnya",
+  },
+  {
+    id: "2",
+    video: "/videos/video0002.mp4",
+    title: "Kategori Dua",
+    description: "Deskripsi singkat untuk kategori kedua — ganti dengan konten kamu.",
+    href: "/kategori/dua",
+    ctaLabel: "Selengkapnya",
+  },
+  {
+    id: "3",
+    video: "/videos/video0003.mp4",
+    title: "Kategori Tiga",
+    description: "Deskripsi singkat untuk kategori ketiga — ganti dengan konten kamu.",
+    href: "/kategori/tiga",
+    ctaLabel: "Selengkapnya",
+  },
+  {
+    id: "4",
+    video: "/videos/video0004.mp4",
+    title: "Kategori Empat",
+    description: "Deskripsi singkat untuk kategori keempat — ganti dengan konten kamu.",
+    href: "/kategori/empat",
+    ctaLabel: "Selengkapnya",
+  },
+  {
+    id: "5",
+    video: "/videos/video0005.mp4",
+    title: "Kategori Lima",
+    description: "Deskripsi singkat untuk kategori kelima — ganti dengan konten kamu.",
+    href: "/kategori/lima",
+    ctaLabel: "Selengkapnya",
+  },
 ];
