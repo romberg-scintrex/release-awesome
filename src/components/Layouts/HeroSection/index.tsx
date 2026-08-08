@@ -1,7 +1,19 @@
-import MaskRevealHero from "@/components/Fragments/MaskReveal";
+"use client";
+
+import dynamic from "next/dynamic";
 import { NoiseTexture } from "@/components/Elements/NoiseTexture";
 import { HeroOverlay } from "@/components/Fragments/HeroOverlay";
 import { MobileHero } from "@/components/Fragments/HeroMobile";
+
+const MaskRevealHero = dynamic(
+  () => import("@/components/Fragments/MaskReveal"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[100svh] min-h-[640px] w-full bg-[rgb(var(--bg))]" />
+    ),
+  }
+);
 
 export function HeroSection() {
   return (

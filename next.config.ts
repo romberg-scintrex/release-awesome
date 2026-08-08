@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
-// Content-Security-Policy in report-only mode.
-// Switch the header key to "Content-Security-Policy" once the live site
-// reports zero violations (check Vercel logs / browser console).
+// Content-Security-Policy — enforcing mode.
 const csp = [
   "default-src 'self'",
   // 'unsafe-inline' covers Next.js hydration scripts and JSON-LD blocks.
@@ -12,9 +10,9 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   // Supabase media, placeholder images used in dev/demo, data/blob for WebGL,
   // and third-party free tech logo assets used in the marquee.
-  "img-src 'self' data: blob: *.supabase.co picsum.photos images.unsplash.com cdn.simpleicons.org",
-  // Supabase REST + realtime (wss), own API routes.
-  "connect-src 'self' *.supabase.co wss://*.supabase.co",
+  "img-src 'self' data: blob: *.supabase.co picsum.photos images.unsplash.com cdn.simpleicons.org upload.wikimedia.org",
+  // Supabase REST + realtime (wss), own API routes, Vercel Speed Insights.
+  "connect-src 'self' *.supabase.co wss://*.supabase.co vitals.vercel-insights.com",
   // Turnstile renders in an iframe.
   "frame-src challenges.cloudflare.com",
   "font-src 'self'",
@@ -49,9 +47,7 @@ const nextConfig: NextConfig = {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains",
           },
-          // Report-only: violations are logged but never blocked.
-          // Flip to "Content-Security-Policy" once the live site is clean.
-          { key: "Content-Security-Policy-Report-Only", value: csp },
+          { key: "Content-Security-Policy", value: csp },
         ],
       },
     ];

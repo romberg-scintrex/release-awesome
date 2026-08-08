@@ -186,14 +186,15 @@ export function HeroOverlay() {
 function RoleTypewriter() {
   return (
     <span
+      role="img"
       className="relative inline-flex h-6 overflow-hidden align-baseline"
       aria-label={ROLES.join(", ")}
     >
-      {/* CSS-driven roll (see .role-roll in globals.css) — loops reliably on the
-          compositor. The trailing duplicate of ROLES[0] makes the wrap seamless. */}
       <span
         aria-hidden
         className="role-roll flex flex-col"
+        // CSS-driven roll (see .role-roll in globals.css) — loops reliably on the
+        // compositor. The trailing duplicate of ROLES[0] makes the wrap seamless.
         style={{ "--role-rh": "1.5rem", "--role-dur": "10s" } as CSSProperties}
       >
         {ROLES.map((role) => (
