@@ -33,7 +33,7 @@ describe("notify-client", () => {
       configurable: true,
     });
 
-    global.fetch = fetchMock;
+    global.fetch = fetchMock as unknown as typeof fetch;
   });
 
   it("notifyVisit sends beacon with type visit", () => {

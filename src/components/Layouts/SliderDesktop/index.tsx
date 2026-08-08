@@ -11,6 +11,7 @@ interface SlideDesktopHeading {
   eyebrow?: string;
   title: string;
   description?: string;
+  headingAs?: "h2" | "h3";
 }
 
 interface SlideDesktopProps {
@@ -44,7 +45,9 @@ export function SlideDesktop({
 }: SlideDesktopProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -53,7 +56,6 @@ export function SlideDesktop({
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
     const onChange = () => setReducedMotion(mq.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -136,7 +138,7 @@ export function SlideDesktop({
             eyebrow={heading.eyebrow}
             title={heading.title}
             description={heading.description}
-            as="h3"
+            as={heading.headingAs ?? "h2"}
           />
         </div>
       )}
@@ -238,7 +240,6 @@ export function SlideDesktop({
                 type="button"
                 role="tab"
                 aria-selected={isActive}
-                aria-current={isActive}
                 onClick={() => goTo(i)}
                 className={cn(
                   "group relative flex h-full w-1/4 min-w-[210px] shrink-0 flex-col justify-between border-l border-white/10 px-5 py-6 text-left transition-colors duration-300 first:border-l-0",

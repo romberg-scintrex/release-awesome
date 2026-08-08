@@ -307,6 +307,7 @@ export function MobileHero({ className }: Readonly<{ className?: string }>) {
 function RoleTypewriter() {
   return (
     <span
+      role="img"
       className="relative inline-flex h-6 overflow-hidden align-baseline"
       aria-label={ROLES.join(", ")}
     >
