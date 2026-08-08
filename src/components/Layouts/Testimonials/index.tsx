@@ -10,6 +10,7 @@ interface TestimonialsHeading {
   eyebrow?: string;
   title: string;
   description?: string;
+  headingAs?: "h2" | "h3";
 }
 
 interface TestimonialsProps {
@@ -37,7 +38,7 @@ export function Testimonials({ testimonials, heading }: TestimonialsProps) {
             eyebrow={heading.eyebrow}
             title={heading.title}
             description={heading.description}
-            as="h3"
+            as={heading.headingAs ?? "h2"}
           />
         )}
 

@@ -50,6 +50,7 @@ export default async function Home() {
         href={settings.heroFrontURL ?? "/images/p2.avif"}
         media="(min-width: 768px)"
         crossOrigin="anonymous"
+        fetchPriority="high"
       />
       <script
         type="application/ld+json"

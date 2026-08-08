@@ -123,6 +123,14 @@ export function MarqueeTech() {
   return (
     <section className="relative overflow-hidden border-y border-black/10 py-12 dark:border-white/10">
 
+      <ul className="sr-only" aria-label="Tech stack yang saya gunakan sehari-hari">
+        {techMarquee.map((tech) => (
+          <li key={tech.description}>
+            <strong>{tech.description}</strong>: {tech.detail}
+          </li>
+        ))}
+      </ul>
+
       <div className="container">
         <p className="mb-6 text-center text-xs font-medium uppercase tracking-[0.24em] text-ink-400">
           Tools which I use on a daily basis.
