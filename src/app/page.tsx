@@ -1,9 +1,11 @@
 import { Metadata } from "next";
 import { HeroSection } from "@/components/Layouts/HeroSection";
 import { MarqueeTech } from "@/components/Layouts/MarqueeTech";
+import { SlideDesktop } from "@/components/Layouts/SliderDesktop";
 import { Testimonials } from "@/components/Layouts/Testimonials";
 import { SITE, jsonLdHtml } from "@/lib/utils";
 import { getSettings, getTestimonials } from "@/lib/queries";
+import { defaultSlides } from "@/lib/default";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -55,7 +57,24 @@ export default async function Home() {
       />
       <HeroSection />
       <MarqueeTech />
-      <Testimonials testimonials={testimonials} />
+      <SlideDesktop 
+        slides={defaultSlides}
+        heading={{
+          index: "01",
+          eyebrow: "Writing",
+          title: "Thoughts worth shipping",
+          description: "Notes from the trenches of building software — lessons learned, ideas explored, and the occasional rabbit hole. Grab a coffee and dig in.",
+        }}
+      />
+      <Testimonials 
+        testimonials={testimonials}
+        heading={{
+          index: "02",
+          eyebrow: "Kind words",
+          title: "What people I've worked with say",
+          description: "Notes from collaborators, mentors, and clients.",
+        }}
+      />
     </>
   );
 }
