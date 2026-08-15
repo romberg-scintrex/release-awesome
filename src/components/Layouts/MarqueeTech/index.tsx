@@ -3,87 +3,92 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import type { Tool } from "@/lib/types";
 
 const techMarquee = [
   {
-    image: "https://cdn.simpleicons.org/go",
+    image: "https://cdn.simpleicons.org/go/000000",
     description: "Go",
     detail: "Enterprise-grade backend language used for scalable services.",
   },
   {
-    image: "https://cdn.simpleicons.org/typescript",
+    image: "https://cdn.simpleicons.org/typescript/000000",
     description: "TypeScript",
     detail: "Typed JavaScript that improves large application maintainability.",
   },
   {
-    image: "https://cdn.simpleicons.org/javascript",
+    image: "https://cdn.simpleicons.org/javascript/000000",
     description: "JavaScript",
     detail: "Core language for the web, tooling, and interactive experiences.",
   },
   {
-    image: "https://cdn.simpleicons.org/nodedotjs",
+    image: "https://cdn.simpleicons.org/nodedotjs/000000",
     description: "Node.js",
     detail: "JavaScript runtime for fast server-side and tooling workflows.",
   },
   {
-    image: "https://cdn.simpleicons.org/react",
+    image: "https://cdn.simpleicons.org/react/000000",
     description: "React",
     detail: "Frontend library for building interactive UI components.",
   },
   {
-    image: "https://cdn.simpleicons.org/nextdotjs",
+    image: "https://cdn.simpleicons.org/nextdotjs/000000",
     description: "Next.js",
     detail: "React framework for routing, rendering, and full-stack delivery.",
   },
   {
-    image: "https://cdn.simpleicons.org/postgresql",
+    image: "https://cdn.simpleicons.org/postgresql/000000",
     description: "PostgreSQL",
     detail: "Powerful relational database with reliable ACID semantics.",
   },
   {
-    image: "https://cdn.simpleicons.org/mongodb",
+    image: "https://cdn.simpleicons.org/mongodb/000000",
     description: "MongoDB",
     detail: "Document database built for flexible, scalable data models.",
   },
   {
-    image: "https://cdn.simpleicons.org/redis",
+    image: "https://cdn.simpleicons.org/redis/000000",
     description: "Redis",
     detail: "In-memory store for cache, session, and pub/sub patterns.",
   },
   {
-    image: "https://cdn.simpleicons.org/docker",
+    image: "https://cdn.simpleicons.org/docker/000000",
     description: "Docker",
     detail: "Container platform for portable application packaging.",
   },
   {
-    image: "https://cdn.simpleicons.org/kubernetes",
+    image: "https://cdn.simpleicons.org/kubernetes/000000",
     description: "Kubernetes",
     detail: "Orchestration system for managing container workloads.",
   },
   {
-    image: "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
-    description: "AWS",
+    image: "https://cdn.simpleicons.org/googlecloud/000000",
+    description: "Google Cloud Platform",
     detail: "Cloud platform for infrastructure, storage, and managed services.",
   },
   {
-    image: "https://cdn.simpleicons.org/apachekafka",
+    image: "https://cdn.simpleicons.org/apachekafka/000000",
     description: "Kafka",
     detail: "Distributed event streaming backbone for real-time systems.",
   },
   {
-    image: "https://cdn.simpleicons.org/git",
+    image: "https://cdn.simpleicons.org/git/000000",
     description: "Git",
     detail: "Version control system for change tracking and collaboration.",
   },
   {
-    image: "https://cdn.simpleicons.org/githubactions",
+    image: "https://cdn.simpleicons.org/githubactions/000000",
     description: "CI / CD",
     detail: "Automated delivery pipeline for continuous integration and deployment.",
   },
 ];
 
-export function MarqueeTech() {
-  const rows = [...techMarquee, ...techMarquee];
+interface MarqueeTechClientProps {
+  tools: Tool[];
+}
+
+export function MarqueeTech({ tools }: MarqueeTechClientProps) {
+  const rows = [...tools, ...tools];
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const pointerRef = useRef({ x: 0, y: 0 });
   const isHoveringRef = useRef(false);
@@ -124,9 +129,9 @@ export function MarqueeTech() {
     <section className="relative overflow-hidden border-y border-black/10 py-12 dark:border-white/10">
 
       <ul className="sr-only" aria-label="Tech stack yang saya gunakan sehari-hari">
-        {techMarquee.map((tech) => (
-          <li key={tech.description}>
-            <strong>{tech.description}</strong>: {tech.detail}
+        {tools.map((tech) => (
+          <li key={tech.id || tech.name}>
+            <strong>{tech.name}</strong>: {tech.tagline || tech.description}
           </li>
         ))}
       </ul>
@@ -159,15 +164,23 @@ export function MarqueeTech() {
         >
           {rows.map((label, i) => {
             const isActive = activeIndex === i;
+            const hasExternalUrl = Boolean(label.externalUrl && label.externalUrl.trim() !== "");
 
             return (
-              <div key={`${label.description}-${i}`} className="relative flex flex-col items-center">
+              <div key={`${label.id || label.slug}-${i}`} className="relative flex flex-col items-center">
                 <motion.div
                   layout
                   whileHover={{ y: -2, scale: 1.01 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}                  
                   data-tech-index={i}                  
-                  className="relative flex h-20 w-20 items-center justify-center rounded-[2rem] border border-black/5 bg-white/80 shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:border-white/10 dark:bg-white/[0.05]"
+                  className={`relative flex h-20 w-20 items-center justify-center rounded-[2rem] border border-black/5 bg-white/80 shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:border-white/10 dark:bg-white/[0.05] ${
+                    hasExternalUrl ? "cursor-pointer" : ""
+                  }`}
+                  onClick={() => {
+                    if (hasExternalUrl) {
+                      window.open(label.externalUrl!, "_blank", "noopener,noreferrer");
+                    }
+                  }}
                   onPointerEnter={() => setActiveIndex(i)}
                   onPointerMove={() => setActiveIndex(i)}
                   onPointerLeave={() => setActiveIndex(null)}
@@ -180,22 +193,28 @@ export function MarqueeTech() {
                     transition={{ duration: 0.22, ease: "easeOut" }}
                   />
 
-                  <Image
-                    src={label.image}
-                    alt={label.description}
-                    width={48}
-                    height={48}
-                    unoptimized
-                    className="relative z-10 h-12 w-12 object-contain transition-transform duration-300 ease-out"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {label.icon ? (
+                    <Image
+                      src={label.icon}
+                      alt={label.name || label.description || "Tool icon"}
+                      width={48}
+                      height={48}
+                      unoptimized
+                      className="relative z-10 h-12 w-12 object-contain transition-transform duration-300 ease-out dark:invert"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span className="relative z-10 text-sm font-bold tracking-tight text-ink-950 dark:text-white">
+                      {label.name ? label.name.slice(0, 2).toUpperCase() : "TL"}
+                    </span>
+                  )}
                 </motion.div>
 
                 <AnimatePresence mode="wait">
                   {isActive && (
                     <motion.div
-                      key={`${label.description}-${i}-tooltip`}
+                      key={`${label.id || label.slug}-${i}-tooltip`}
                       initial={{ opacity: 0, y: 10, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.98 }}
@@ -204,7 +223,7 @@ export function MarqueeTech() {
                       style={{ marginLeft: "calc(50% - 5rem)", marginRight: "calc(50% - 5rem)" }}
                     >
                       <p className="mt-1 text-[10px] leading-4 text-ink-500 dark:text-ink-300">
-                        {label.detail}
+                        {label.tagline || label.description}
                       </p>
                     </motion.div>
                   )}
