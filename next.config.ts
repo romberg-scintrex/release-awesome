@@ -14,7 +14,7 @@ const csp = [
   // Supabase REST + realtime (wss), own API routes, Vercel Speed Insights.
   "connect-src 'self' *.supabase.co wss://*.supabase.co vitals.vercel-insights.com",
   // Turnstile renders in an iframe.
-  "frame-src challenges.cloudflare.com",
+  "frame-src 'self' challenges.cloudflare.com *.google.com www.google.com",
   "font-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
