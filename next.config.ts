@@ -3,19 +3,18 @@ import type { NextConfig } from "next";
 // Content-Security-Policy — enforcing mode.
 const csp = [
   "default-src 'self'",
-  // 'unsafe-inline' covers Next.js hydration scripts and JSON-LD blocks.
-  // Turnstile widget is served from challenges.cloudflare.com.
+  // Turnstile widget & Google Maps JS
   "script-src 'self' 'unsafe-inline' challenges.cloudflare.com",
-  // Tailwind and framer-motion both write inline styles.
+  // Tailwind & Framer Motion inline styles
   "style-src 'self' 'unsafe-inline'",
-  // Supabase media, placeholder images used in dev/demo, data/blob for WebGL,
-  // and third-party free tech logo assets used in the marquee.
-  "img-src 'self' data: blob: *.supabase.co picsum.photos images.unsplash.com cdn.simpleicons.org upload.wikimedia.org",
-  // Supabase REST + realtime (wss), own API routes, Vercel Speed Insights.
-  "connect-src 'self' *.supabase.co wss://*.supabase.co vitals.vercel-insights.com",
-  // Turnstile renders in an iframe.
+  // Supabase media, tech logos, serta ubin gambar Google Maps (*.google.com & *.gstatic.com)
+  "img-src 'self' data: blob: *.supabase.co picsum.photos images.unsplash.com cdn.simpleicons.org upload.wikimedia.org *.google.com *.gstatic.com *.googleapis.com",
+  // Supabase, Vercel Insights, Cloudflare Turnstile POST, dan fetch data Google Maps
+  "connect-src 'self' *.supabase.co wss://*.supabase.co vitals.vercel-insights.com challenges.cloudflare.com *.google.com *.gstatic.com *.googleapis.com",
+  // Turnstile iframe & Google Maps embed iframe
   "frame-src 'self' challenges.cloudflare.com *.google.com www.google.com",
-  "font-src 'self'",
+  // Font internal & font dari Google Maps/Static
+  "font-src 'self' data: *.gstatic.com",
   "object-src 'none'",
   "base-uri 'self'",
 ].join("; ");
