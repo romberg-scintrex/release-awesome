@@ -3,17 +3,12 @@ import type { NextConfig } from "next";
 // Content-Security-Policy — enforcing mode.
 const csp = [
   "default-src 'self'",
-  // Turnstile widget & Google Maps JS
-  "script-src 'self' 'unsafe-inline' challenges.cloudflare.com",
-  // Tailwind & Framer Motion inline styles
+  // Tambahkan 'unsafe-eval' agar React dev-mode & Turnstile script bisa berjalan
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
-  // Supabase media, tech logos, serta ubin gambar Google Maps (*.google.com & *.gstatic.com)
   "img-src 'self' data: blob: *.supabase.co picsum.photos images.unsplash.com cdn.simpleicons.org upload.wikimedia.org *.google.com *.gstatic.com *.googleapis.com",
-  // Supabase, Vercel Insights, Cloudflare Turnstile POST, dan fetch data Google Maps
-  "connect-src 'self' *.supabase.co wss://*.supabase.co vitals.vercel-insights.com challenges.cloudflare.com *.google.com *.gstatic.com *.googleapis.com",
-  // Turnstile iframe & Google Maps embed iframe
+  "connect-src 'self' challenges.cloudflare.com *.supabase.co wss://*.supabase.co vitals.vercel-insights.com *.google.com *.gstatic.com *.googleapis.com",
   "frame-src 'self' challenges.cloudflare.com *.google.com www.google.com",
-  // Font internal & font dari Google Maps/Static
   "font-src 'self' data: *.gstatic.com",
   "object-src 'none'",
   "base-uri 'self'",

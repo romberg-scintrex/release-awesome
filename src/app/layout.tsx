@@ -171,7 +171,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdHtml(websiteLd) }}
         />
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <SettingsProvider value={settings}>
             <SiteFrame settings={settings}>{children}</SiteFrame>
           </SettingsProvider>
