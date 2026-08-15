@@ -4,7 +4,7 @@ import { MarqueeTech } from "@/components/Layouts/MarqueeTech";
 import { SlideDesktop } from "@/components/Layouts/SliderDesktop";
 import { Testimonials } from "@/components/Layouts/Testimonials";
 import { SITE, jsonLdHtml } from "@/lib/utils";
-import { getSettings, getTestimonials } from "@/lib/queries";
+import { getSettings, getTestimonials, getTools } from "@/lib/queries";
 import { defaultSlides } from "@/lib/default";
 
 export const metadata: Metadata = {
@@ -15,9 +15,10 @@ export const revalidate = 60;
 
 export default async function Home() {
 
-    const [ settings, testimonials ] = await Promise.all([
+    const [ settings, testimonials, tools ] = await Promise.all([
     getSettings(),
     getTestimonials(),
+    getTools(),
   ]);
   
   const profilePageLd = {
@@ -57,7 +58,9 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(profilePageLd) }}
       />
       <HeroSection />
-      <MarqueeTech />
+      <MarqueeTech 
+        tools={tools}
+      />
       <SlideDesktop 
         slides={defaultSlides}
         heading={{
