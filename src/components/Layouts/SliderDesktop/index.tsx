@@ -23,20 +23,6 @@ interface SlideDesktopProps {
   heading?: SlideDesktopHeading;
 }
 
-/**
- * Full-bleed "click to preview" market/feature slider: a crossfading video or
- * image background, with a row of full-height nav cards (header always
- * visible, content + CTA revealed on the active card) laid on top.
- * Native implementation — no Slick/jQuery.
- *
- * Heading + carousel now live inside ONE <section> element (valid HTML5
- * outline: a <section> may contain a heading + its related content). The
- * carousel's inner wrapper — previously itself a <section> — is demoted to a
- * <div role="region"> so we don't end up with a bare, un-headed nested
- * <section>. This is purely a tag swap: the DOM order, the `relative` /
- * `overflow-hidden` stacking context, and paint order are all unchanged, so
- * the canvas/menu layers still sit correctly relative to the heading.
- */
 export function SlideDesktop({
   slides,
   autoPlayMs = 60000,
@@ -45,17 +31,19 @@ export function SlideDesktop({
 }: SlideDesktopProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+  const [reducedMotion, setReducedMotion] = useState(false);
+
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const count = slides.length;
 
+  // Safe client-side reduced motion check to avoid hydration mismatch
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+
     const onChange = () => setReducedMotion(mq.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -79,14 +67,6 @@ export function SlideDesktop({
     };
   }, [activeIndex, autoPlayMs, isPaused, reducedMotion, count, next]);
 
-  // Horizontal-only scroll to keep the active nav card in view inside the
-  // menu strip. Deliberately NOT using `element.scrollIntoView()` here: even
-  // with `block: "nearest"`, scrollIntoView recalculates the element's
-  // position against the whole page viewport (not just this container), so
-  // if the card is judged "not visible enough" vertically — e.g. the user
-  // has scrolled down to Testimonials while autoplay advances the slide —
-  // the browser yanks the entire page back up to this section. Scrolling
-  // `menu.scrollLeft` directly only ever moves this container, never the page.
   useEffect(() => {
     const menu = menuRef.current;
     if (!menu) return;
@@ -99,17 +79,12 @@ export function SlideDesktop({
     menu.scrollTo({ left: target, behavior: "smooth" });
   }, [activeIndex]);
 
-  // Imperatively play the active video and pause the rest. The `autoPlay`
-  // attribute only fires once on mount, so switching slides after that needs
-  // an explicit .play()/.pause() call via ref — otherwise only slide 0 ever plays.
   useEffect(() => {
     videoRefs.current.forEach((videoEl, i) => {
       if (!videoEl) return;
       if (i === activeIndex) {
         videoEl.currentTime = 0;
-        videoEl.play().catch(() => {
-          // Autoplay can be rejected (e.g. tab backgrounded); safe to ignore.
-        });
+        videoEl.play().catch(() => {});
       } else {
         videoEl.pause();
       }
@@ -119,19 +94,16 @@ export function SlideDesktop({
   if (count === 0) return null;
 
   return (
-    // Single <section> wraps heading + carousel together. Heading stays in
-    // normal document flow, ahead of the `relative overflow-hidden` carousel
-    // container in the DOM — so it keeps its own natural paint order and
-    // can't be clipped or z-index-shadowed by the absolutely-positioned
-    // canvas/menu layers inside the carousel div below.
     <section
-      className="relative w-full py-16 sm:py-20"
+      className="relative flex h-screen w-full flex-col justify-between border-y border-black/10 py-8 dark:border-white/10"
       aria-label={heading?.title ?? slides[activeIndex].title}
+      style={
+        {
+          "--slider-progress-duration": `${autoPlayMs}ms`,
+        } as React.CSSProperties
+      }
     >
       {heading && (
-        // Same `.container` used by Testimonials' <section className="container ...">
-        // so the eyebrow/title/description line up on the same left/right
-        // edge as the testimonials heading, instead of sitting flush at 0.
         <div className="container">
           <SectionHeading
             index={heading.index}
@@ -145,11 +117,8 @@ export function SlideDesktop({
 
       <div
         className={cn(
-          // Intentionally NOT wrapped in .container — the carousel stays
-          // full-bleed (edge-to-edge video/image), only the heading above
-          // it aligns to the container grid.
-          "relative hidden h-[520px] w-full overflow-hidden bg-ink-800 md:block",
-          heading && "mt-8",
+          "relative hidden h-full flex-1 w-full overflow-hidden bg-ink-800 md:block",
+          heading && "mt-6",
           className
         )}
         onMouseEnter={() => setIsPaused(true)}
@@ -158,7 +127,7 @@ export function SlideDesktop({
         aria-roledescription="carousel"
         aria-label={slides[activeIndex].title}
       >
-        {/* Canvas layer — crossfading video or image background */}
+        {/* Canvas layer */}
         <div className="absolute inset-0 z-0">
           {slides.map((slide, i) => (
             <div
@@ -196,10 +165,10 @@ export function SlideDesktop({
           ))}
         </div>
 
-        {/* Top-shadow — legibility gradient so card headers read over bright footage */}
+        {/* Top-shadow */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-60 bg-gradient-to-b from-black/65 to-transparent" />
 
-        {/* Prev / next controls */}
+        {/* Prev / Next controls */}
         {count > 1 && (
           <>
             <button
@@ -225,24 +194,30 @@ export function SlideDesktop({
           </>
         )}
 
-        {/* Menu layer — full-height nav cards; click swaps the active background */}
+        {/* Menu layer */}
         <div
           ref={menuRef}
           role="tablist"
           aria-label="Pilih slide"
-          className="no-scrollbar absolute inset-0 z-20 flex overflow-x-auto"
+          className="absolute inset-0 z-20 flex w-full overflow-hidden"
         >
           {slides.map((slide, i) => {
             const isActive = i === activeIndex;
             return (
-              <button
+              <div
                 key={slide.id}
-                type="button"
                 role="tab"
+                tabIndex={0}
                 aria-selected={isActive}
                 onClick={() => goTo(i)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    goTo(i);
+                  }
+                }}
                 className={cn(
-                  "group relative flex h-full w-1/4 min-w-[210px] shrink-0 flex-col justify-between border-l border-white/10 px-5 py-6 text-left transition-colors duration-300 first:border-l-0",
+                  "group relative flex h-full flex-1 cursor-pointer flex-col justify-between border-l border-white/10 px-4 py-6 text-left transition-colors duration-300 first:border-l-0 sm:px-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50",
                   isActive ? "bg-black/40" : "bg-black/5 hover:bg-black/25"
                 )}
               >
@@ -258,8 +233,7 @@ export function SlideDesktop({
                   {isActive && !reducedMotion && autoPlayMs > 0 && !isPaused && (
                     <span
                       key={activeIndex}
-                      className="progress-fill absolute -bottom-2 left-0 h-0.5 w-full origin-left bg-accent"
-                      style={{ ["--progress-duration" as string]: `${autoPlayMs}ms` }}
+                      className="animate-progress-fill absolute -bottom-2 left-0 h-0.5 w-full origin-left bg-accent"
                     />
                   )}
                 </header>
@@ -290,7 +264,7 @@ export function SlideDesktop({
                     )}
                   </div>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
