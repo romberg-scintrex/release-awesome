@@ -6,6 +6,16 @@
 --  Run in the Supabase SQL editor (or `supabase db push`) AFTER 0003.
 -- ============================================================================
 
+TRUNCATE TABLE public.about_scenes; 
+
+INSERT INTO public.about_scenes (
+    scene_order, badge_text, title_primary, title_highlight, subtitle_code, description, text_position, bg_kinetic_text, button_label, button_url, published
+) VALUES (
+    1, 'BACKEND ENGINEER', 'Crafting Scalable', 'Microservices & APIs', 'pkg/main.go', 'Specializing in Go ecosystem, high-throughput distributed systems, event-driven architectures, and high-availability database designs for modern enterprise applications.', 'left', 'GOLANG', 'Explore Projects', '/projects', true), (
+    2, 'CURRENT ROLE', 'Building Core Banking Solutions at', 'PT Bank Sinarmas Tbk', 'bank_sinarmas.service', 'Developing asynchronous document processing pipelines, Kafka event publishing via Outbox Pattern, and automated K8s schedulers for high-traffic banking workflows.', 'right', 'BANKING', 'View Experience', '#path-so-far', true), (
+    3, 'ARCHITECTURAL FOCUS', 'Event-Driven Systems &', 'Clean Architecture', 'net/http::200_OK', 'Passionate about maintainable code structures, gRPC API gateways, and zero-downtime microservice migrations. Open for technical discussions & engineering collaborations.', 'left', 'SCALE', 'Get In Touch', '/contact', true
+);
+
 alter table public.site_settings
   add column if not exists stats jsonb not null default '[
     { "value": 3.0, "suffix": " / 4.0", "label": "Current GPA" },

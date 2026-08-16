@@ -163,3 +163,50 @@ create policy "media_auth_update" on storage.objects
   for update to authenticated using (bucket_id = 'media');
 create policy "media_auth_delete" on storage.objects
   for delete to authenticated using (bucket_id = 'media');
+
+-- ============================================================================
+--  ABOUT SCENES (GSAP Scrollytelling Table & Seed Data)
+-- ============================================================================
+
+-- 1. Create Table
+create table if not exists public.about_scenes (
+  id               uuid primary key default gen_random_uuid(),
+  scene_order      int not null default 0,
+  badge_text       text,
+  title_primary    text not null,
+  title_highlight  text,
+  subtitle_code    text,
+  description      text not null default '',
+  text_position    text not null default 'left' check (text_position in ('left', 'right')),
+  bg_kinetic_text  text,
+  button_label     text,
+  button_url       text,
+  published        boolean not null default true,
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
+);
+
+-- Indexes for efficient ordering & filtering
+create index if not exists about_scenes_published_order_idx on public.about_scenes (published, scene_order asc);
+
+-- Trigger for auto updated_at
+drop trigger if exists trg_about_scenes_updated on public.about_scenes;
+create trigger trg_about_scenes_updated before update on public.about_scenes
+  for each row execute function public.set_updated_at();
+
+-- 2. Row Level Security (RLS)
+alter table public.about_scenes enable row level security;
+
+drop policy if exists "about_scenes_select" on public.about_scenes;
+drop policy if exists "about_scenes_insert" on public.about_scenes;
+drop policy if exists "about_scenes_update" on public.about_scenes;
+drop policy if exists "about_scenes_delete" on public.about_scenes;
+
+create policy "about_scenes_select" on public.about_scenes
+  for select using (published = true or auth.role() = 'authenticated');
+create policy "about_scenes_insert" on public.about_scenes
+  for insert to authenticated with check (true);
+create policy "about_scenes_update" on public.about_scenes
+  for update to authenticated using (true) with check (true);
+create policy "about_scenes_delete" on public.about_scenes
+  for delete to authenticated using (true);

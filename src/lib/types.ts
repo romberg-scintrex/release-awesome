@@ -120,3 +120,17 @@ export interface Tool {
   published: boolean;
   sortOrder: number;
 }
+
+export interface AboutScene {
+  id: string;
+  scene_order: number;
+  badge_text: string | null;
+  title_primary: string;
+  title_highlight: string | null;
+  subtitle_code: string | null;
+  description: string;
+  text_position: "left" | "right";
+  bg_kinetic_text: string | null;
+  button_label: string | null;
+  button_url: string | null;
+}

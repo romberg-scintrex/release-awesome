@@ -28,8 +28,11 @@ export function CustomCursor() {
       x.set(e.clientX);
       y.set(e.clientY);
 
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
+      const target = e.target;
+      // Guard: only Element nodes have .closest(). Text nodes, SVG text nodes,
+      // and other non-Element event targets (e.g. document, window proxies)
+      // do not, and calling .closest() on them throws at runtime.
+      if (!(target instanceof Element)) return;
 
       const interactive = target.closest<HTMLElement>(
         "a, button, [role='button'], input, textarea, select, [data-cursor]",
