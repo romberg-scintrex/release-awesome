@@ -13,7 +13,7 @@ import {
     type LucideIcon,
 } from 'lucide-react'
 
-import type { Project, Testimonial, Stat, SlideItem } from "@/lib/types";
+import type { Project, Testimonial, Stat, SlideItem, AboutScene } from "@/lib/types";
 
 // Re-export the shared types so existing imports (`@/lib/data`) keep working.
 export type { Project, ProjectCategory, Testimonial, GalleryItem, Stat } from "@/lib/types";
@@ -234,6 +234,51 @@ export const seedTestimonials: Testimonial[] = [
 ];
 
 
+export const seedAboutScenes: AboutScene[] = [
+  {
+    id: "scene-1",
+    scene_order: 1,
+    badge_text: "Background",
+    subtitle_code: "// who_i_am.go",
+    title_primary: "Building systems",
+    title_highlight: "that scale.",
+    description:
+      "Software Engineer with 3+ years focused on Golang microservices, event-driven architecture, and cloud-native infrastructure. I care about clean code, fast APIs, and systems that hold up under pressure.",
+    text_position: "left",
+    bg_kinetic_text: "ENGINEER",
+    button_label: null,
+    button_url: null,
+  },
+  {
+    id: "scene-2",
+    scene_order: 2,
+    badge_text: "Stack",
+    subtitle_code: "// tech_stack.go",
+    title_primary: "Go, Next.js &",
+    title_highlight: "the cloud.",
+    description:
+      "My core toolkit: Golang for high-throughput services, Next.js + TypeScript for the frontend, PostgreSQL & Redis for data, Kafka for events, and Docker/Kubernetes on AWS for deployment.",
+    text_position: "right",
+    bg_kinetic_text: "BACKEND",
+    button_label: null,
+    button_url: null,
+  },
+  {
+    id: "scene-3",
+    scene_order: 3,
+    badge_text: "Let's work",
+    subtitle_code: "// contact.go",
+    title_primary: "Open to new",
+    title_highlight: "opportunities.",
+    description:
+      "Based in Jakarta, Indonesia. Available for backend, full-stack, or platform engineering roles. I enjoy collaborating on ambitious products and teams that value craft.",
+    text_position: "left",
+    bg_kinetic_text: "JAKARTA",
+    button_label: "Get in touch",
+    button_url: "/contact",
+  },
+];
+
 // ─────────────────────────────────────────────────────────────
 //  STATIC CONTENT (not managed via the admin panel for now)
 // ─────────────────────────────────────────────────────────────
@@ -326,43 +371,52 @@ export interface TimelineEntry {
 
 export const timeline: TimelineEntry[] = [
   {
-    year: "2024 - Present",
-    title: "B.Sc. (Hons) in Information Technology and Management",
-    org: "University of Moratuwa",
-    description:
-      "Reading for an honours degree spanning software engineering, distributed systems, and the business of technology.",
-    type: "education",
-  },
-  {
-    year: "2026",
-    title: "Software Engineering Intern",
-    org: "Open to opportunities - actively looking",
-    description:
-      "Seeking a software engineering / full-stack internship for the 2026 industrial training cycle.",
+    year: "Dec 2024 - Present",
+    title: "Backend Golang Developer",
+    org: "PT Accord Innovations Indonesia (On-site at PT Bank Sinarmas Tbk)",
+    description: "Developing end-to-end backend features, APIs, and event-driven microservices for banking systems. Implemented Kafka event publishing, Outbox Pattern, and K8s automated document processing schedulers.",
     type: "experience",
   },
   {
-    year: "2025",
-    title: "Software Engineer · Part-time (Remote)",
-    org: "Ryzera (Pvt) Ltd",
-    description:
-      "Building and shipping production features remotely while studying full-time.",
+    year: "Aug 2023 - Dec 2024",
+    title: "Backend Golang Developer",
+    org: "PT. Sarana Pactindo",
+    description: "Built gRPC-based API Gateways and promo/referral microservices from scratch using Clean Architecture. Managed production support, Kibana bug tracing, and Redis caching for core onboarding & registration services.",
     type: "experience",
   },
   {
-    year: "2022",
-    title: "G.C.E. Advanced Level - Physical Science",
-    org: "Z-score 1.498",
-    description:
-      "Physical Science stream - Combined Maths, Physics, and Chemistry.",
+    year: "Mar 2023 - Jun 2023",
+    title: "Immersive Program Backend Engineering",
+    org: "Alterra Academy",
+    description: "An intensive 3-month program designed to train aspiring backend engineers in the fundamentals of software development.",
     type: "education",
   },
   {
-    year: "2018",
-    title: "G.C.E. Ordinary Level - 9 A's",
-    org: "Nine A passes (A9)",
-    description:
-      "Straight A's including English Literature, Business & Accounting Studies, and ICT.",
+    year: "Sep 2022 - Feb 2023",
+    title: "Data Analyst",
+    org: "PT. Kembar Putra Makmur",
+    description: "Managed weekly sales KPIs and incentive reporting using SQL, MS Access, and Excel. Collaborated with web and mobile developer teams to enhance internal application sales reporting tools.",
+    type: "experience",
+  },
+  {
+    year: "Dec 2018 - Sep 2020",
+    title: "Exploration Geophysicist Engineer",
+    org: "PT. Tunggal Buana Utama",
+    description: "Served as Quality Control Engineer for major exploration projects (PT Vale Indonesia & PT Sumbawa Timur Mining). Processed microseismic noise data using Python (ObsPy, NumPy, SciPy).",
+    type: "experience",
+  },
+  {
+    year: "May 2018",
+    title: "Exploration Geophysicist Intern",
+    org: "PT. Medco E&P Indonesia",
+    description: "Conducted statistical analysis on seismic data to evaluate resource potential in the North Sumatra Basin.",
+    type: "experience",
+  },
+  {
+    year: "2014 - 2019",
+    title: "Bachelor of Engineering, Geological/Geophysical Engineering",
+    org: "Universitas Brawijaya",
+    description: "Strong foundation in statistical analysis and numerical data processing",
     type: "education",
   },
 ];

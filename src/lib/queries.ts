@@ -2,8 +2,8 @@ import { cache } from "react";
 import { SITE } from "@/lib/utils";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from "@/lib/supabase/config";
-import type { SiteSettings, Testimonial, Post, Tool, ToolKind, Stat, GalleryItem, Project, ProjectCategory } from "@/lib/types";
-import { defaultStats, seedProjects, seedTestimonials } from "@/lib/default";
+import type { SiteSettings, Testimonial, Post, Tool, ToolKind, Stat, GalleryItem, Project, ProjectCategory, AboutScene } from "@/lib/types";
+import { defaultStats, seedProjects, seedTestimonials, seedAboutScenes } from "@/lib/default";
 
 export const defaultSettings: SiteSettings = {
   name: SITE.name,
@@ -216,6 +216,36 @@ export function mapToolRow(r: ToolRow): Tool {
   };
 }
 
+export interface AboutSceneRow {
+  id: string;
+  scene_order?: number;
+  badge_text?: string | null;
+  title_primary: string;
+  title_highlight?: string | null;
+  subtitle_code?: string | null;
+  description: string;
+  text_position?: "left" | "right";
+  bg_kinetic_text?: string | null;
+  button_label?: string | null;
+  button_url?: string | null;
+}
+
+export function mapAboutSceneRow(r: AboutSceneRow): AboutScene {
+  return {
+    id: r.id,
+    scene_order: r.scene_order ?? 0,
+    badge_text: r.badge_text ?? null,
+    title_primary: r.title_primary,
+    title_highlight: r.title_highlight ?? null,
+    subtitle_code: r.subtitle_code ?? null,
+    description: r.description,
+    text_position: r.text_position === "right" ? "right" : "left",
+    bg_kinetic_text: r.bg_kinetic_text ?? null,
+    button_label: r.button_label ?? null,
+    button_url: r.button_url ?? null,
+  };
+}
+
 /** Lightweight anon client for public reads (no cookies → pages stay cacheable). */
 function anon() {
   return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -370,3 +400,18 @@ export async function getFeaturedPosts(limit = 3): Promise<Post[]> {
   const all = await getPosts();
   return all.filter((p) => p.featured).slice(0, limit);
 }
+
+
+export const getAboutScenes = cache(async (): Promise<AboutScene[]> => {
+  if (!isSupabaseConfigured) return seedAboutScenes;
+  try {
+    const { data, error } = await anon()
+      .from("about_scenes")
+      .select("*")
+      .order("scene_order", { ascending: true });
+    if (error || !data || data.length === 0) return seedAboutScenes;
+    return data.map(mapAboutSceneRow);
+  } catch {
+    return seedAboutScenes;
+  }
+});

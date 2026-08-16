@@ -28,7 +28,7 @@ export function Testimonials({ testimonials, heading }: TestimonialsProps) {
     // (which was doubling the horizontal padding/max-width and knocking the
     // heading out of alignment with both the grid and SlideDesktop's heading).
     <section
-      className="relative w-screen min-h-screen flex flex-col justify-center py-16 sm:py-20"
+      className="relative w-screen min-h-screen flex flex-col justify-center border-y border-ink-900/10 py-16 sm:py-20 dark:border-white/10"
       aria-label={heading?.title ?? "Testimonials"}
     >
       <div className="container">

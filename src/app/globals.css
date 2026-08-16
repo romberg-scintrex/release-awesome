@@ -8,7 +8,7 @@
     --muted: 115 115 115;
     --border: 0 0 0 / 0.08;
     --card: 255 255 255;
-    --accent: 139 92 246;
+    --accent: 16 185 129;
     --noise-opacity: 0.04;
   }
 
@@ -18,7 +18,7 @@
     --muted: 163 163 163;
     --border: 255 255 255 / 0.08;
     --card: 17 17 17;
-    --accent: 167 139 250;
+    --accent: 52 211 153;
     --noise-opacity: 0.06;
   }
 
@@ -74,28 +74,28 @@
     @apply backdrop-blur-2xl border border-white/15 bg-white/10 dark:bg-white/[0.06];
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-violet via-brand-fuchsia to-brand-rose;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500;
   }
   .text-gradient-cool {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-cyan via-brand-violet to-brand-fuchsia;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400;
   }
   .text-gradient-strong {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    background-image: linear-gradient(to right, #6d28d9, #a21caf 52%, #be185d);
+    background-image: linear-gradient(to right, #059669, #0d9488 52%, #0891b2);
   }
-  /* Hero display name — deep, saturated ramp kept dark across every letter so
-     it reads clearly against the cream stage instead of washing out. A slow
+  /* Hero display name — emerald ramp kept rich across every letter so
+     it reads clearly against the stage instead of washing out. A slow
      position drift makes the gradient feel like living light. */
   .text-gradient-hero {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    background-image: linear-gradient(100deg, #4c1d95 0%, #6d28d9 22%, #a21caf 50%, #6d28d9 78%, #4c1d95 100%);
+    background-image: linear-gradient(100deg, #047857 0%, #059669 22%, #0d9488 50%, #059669 78%, #047857 100%);
     background-size: 220% 100%;
     background-position: 0% center;
-    filter: drop-shadow(0 6px 16px rgba(76, 29, 149, 0.28));
+    filter: drop-shadow(0 6px 16px rgba(4, 120, 87, 0.28));
     animation: name-shimmer 7s ease-in-out infinite;
   }
   @keyframes name-shimmer {
@@ -202,7 +202,7 @@
 .hljs-section,
 .hljs-attr,
 .hljs-attribute,
-.hljs-title.function_ { color: #d2a8ff; }
+.hljs-title.function_ { color: #34d399; }
 .hljs-variable,
 .hljs-template-variable,
 .hljs-built_in,
@@ -246,11 +246,7 @@
   color: rgb(var(--fg) / 0.9);
 }
 
-/* Drop cap on the opening paragraph of project case studies only. Their plain
-   text always begins with a letter, so ::first-letter is safe. Blog Markdown
-   keeps the larger standfirst but NO drop cap — post bodies can start with
-   punctuation (e.g. a leading quote), which ::first-letter would enlarge into
-   a broken-looking first word. */
+/* Drop cap on the opening paragraph of project case studies only. */
 .article-prose .lead::first-letter {
   float: left;
   font-family: var(--font-display), "Outfit", Inter, sans-serif;
@@ -258,10 +254,10 @@
   font-size: 3em;
   line-height: 0.76;
   margin: 0.05em 0.09em 0 0;
-  color: #6d28d9;
+  color: #059669;
 }
 .dark .article-prose .lead::first-letter {
-  color: #a78bfa;
+  color: #34d399;
 }
 
 /* Quiet, refined blockquotes, rules, and anchored headings in long-form prose */
@@ -317,8 +313,6 @@ html.lenis body {
   pointer-events: none;
   background: linear-gradient(105deg, transparent 38%, rgba(15, 12, 28, 0.08) 50%, transparent 62%);
   transform: translateX(-140%) skewX(-18deg);
-  /* no base transition: on hover-out the band snaps home off-canvas
-     instead of visibly sweeping backwards across the button */
   transition: none;
 }
 .btn-sheen:hover::after {
@@ -347,9 +341,7 @@ html.lenis body {
   100% { transform: translateX(0); }
 }
 
-/* Vertical role roller — CSS-driven so it loops reliably on the compositor.
-   --role-rh sets one row's height; the trailing duplicate of the first role
-   lets the loop wrap seamlessly. */
+/* Vertical role roller */
 @keyframes role-roll {
   0%,  20% { transform: translateY(0); }
   25%, 45% { transform: translateY(calc(var(--role-rh) * -1)); }
@@ -369,18 +361,12 @@ html.lenis body {
 
 /* ───────────────────────────────────────────────────────────────
    Desktop mask-reveal hero — MaskRevealHero.tsx
-   These rules live in the global sheet (loaded in <head>) instead of
-   styled-jsx inside the client component, so the giant marquee artwork
-   is fully styled on the first server-rendered paint. Otherwise the
-   raw, unstyled marquee text flashes on screen until the component's
-   JavaScript hydrates and injects its styles.
    ─────────────────────────────────────────────────────────────── */
 .hero-container {
   width: 100%;
   height: 100vh;
   position: relative;
   overflow: hidden;
-  /* Cinematic warm-cream stage — center bright, edges fall into warmer beige */
   background:
     radial-gradient(ellipse 80% 65% at 50% 48%,
       #fcfbf6 0%,
@@ -408,7 +394,6 @@ html.lenis body {
   pointer-events: none;
   z-index: 0;
   opacity: 0.5;
-  /* Fade pattern at the centre so the subject doesn't sit on busy texture */
   -webkit-mask-image: radial-gradient(ellipse 55% 60% at 50% 50%, transparent 0%, rgba(0,0,0,0.55) 60%, black 100%);
   mask-image: radial-gradient(ellipse 55% 60% at 50% 50%, transparent 0%, rgba(0,0,0,0.55) 60%, black 100%);
 }
@@ -417,7 +402,6 @@ html.lenis body {
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  /* Soft warm halo that lifts the subject off the marquee */
   background:
     radial-gradient(ellipse 38% 55% at 50% 48%,
       rgba(255, 250, 240, 0.85) 0%,
@@ -475,20 +459,11 @@ html.lenis body {
 .marquee-layer.front {
   z-index: 5;
   color: #1a1816;
-  /* Punch a soft hole through the subject silhouette so the bold
-     marquee stays off the white shirt / face. */
   -webkit-mask-image: radial-gradient(ellipse 32% 90% at 50% 70%,
     transparent 0%, transparent 35%, rgba(0,0,0,0.55) 60%, black 85%);
   mask-image: radial-gradient(ellipse 32% 90% at 50% 70%,
     transparent 0%, transparent 35%, rgba(0,0,0,0.55) 60%, black 85%);
 }
-/* Only the lower row gets the bold front treatment; the top row stays faint
-   (back layer only). Targeting the row keeps the bold band on the same words at
-   every viewport - the old clip-path was a fixed % of the container, so on
-   tall/narrow screens (where the vw-based text is small) it sliced the bold row
-   away and left only the unreadable faint back text on the dark background.
-   visibility:hidden (not display:none) preserves layout so the front row stays
-   pixel-aligned over its faint back twin. */
 .marquee-layer.front .marquee-row.line-1 {
   visibility: hidden;
 }
@@ -509,9 +484,6 @@ html.lenis body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   will-change: transform;
 }
-/* Durations preserve the old px/s speed after the tracks were cut from
-   8/4 copies to 2 (a -50% loop spans one copy width, so duration scales
-   with copy count: line-1 120s × 2/8 = 30s, line-2 120s × 2/4 = 60s). */
 .marquee-row.line-1 .marquee-track {
   animation: scroll-left 30s linear infinite;
 }
@@ -548,34 +520,34 @@ html.lenis body {
   }
 }
 
-/* ── Dark theme — deep purple-ink stage matching MobileHero ───────── */
+/* ── Dark theme — deep emerald-ink stage ───────── */
 .dark .hero-container {
   background:
     radial-gradient(ellipse 80% 65% at 50% 48%,
-      #1d172d 0%,
-      #141021 40%,
-      #0b0914 75%,
-      #07060f 100%);
+      #062319 0%,
+      #041a13 40%,
+      #02100b 75%,
+      #010906 100%);
 }
 .dark .wave-bg {
-  color: #322a4c;
+  color: #113f30;
   opacity: 0.35;
 }
 .dark .stage-spotlight {
-  /* cool violet key light instead of the warm cream halo */
+  /* emerald key light halo */
   background:
     radial-gradient(ellipse 38% 55% at 50% 48%,
-      rgba(167, 139, 250, 0.3) 0%,
-      rgba(167, 139, 250, 0.12) 35%,
-      rgba(167, 139, 250, 0) 70%);
+      rgba(52, 211, 153, 0.25) 0%,
+      rgba(52, 211, 153, 0.1) 35%,
+      rgba(52, 211, 153, 0) 70%);
 }
 .dark .marquee-layer.back {
-  color: #38304f;
+  color: #124d3a;
   opacity: 0.75;
 }
 .dark .marquee-layer.front {
-  color: #ece9f7;
-  text-shadow: 0 0 32px rgba(167, 139, 250, 0.3);
+  color: #e6f7f2;
+  text-shadow: 0 0 32px rgba(52, 211, 153, 0.3);
 }
 .dark .vignette {
   background:
@@ -586,9 +558,9 @@ html.lenis body {
 }
 .dark .top-fade {
   background: linear-gradient(to bottom,
-    rgba(7, 6, 15, 0.95) 0%,
-    rgba(7, 6, 15, 0.7) 35%,
-    rgba(7, 6, 15, 0.3) 70%,
+    rgba(1, 9, 6, 0.95) 0%,
+    rgba(1, 9, 6, 0.7) 35%,
+    rgba(1, 9, 6, 0.3) 70%,
     transparent 100%);
 }
 .dark .grain {
@@ -596,9 +568,7 @@ html.lenis body {
   opacity: 0.05;
 }
 
-/* Per-route enter animation (see PageTransition). CSS-only on purpose: the
-   element's resting state is fully visible (opacity 1), so a navigated page can
-   never get stuck invisible the way AnimatePresence mode="wait" could. */
+/* Per-route enter animation */
 @keyframes page-enter {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
@@ -609,5 +579,25 @@ html.lenis body {
 @media (prefers-reduced-motion: reduce) {
   .page-enter {
     animation: none;
+  }
+}
+
+@layer utilities {
+  :root {
+    --slider-progress-duration: 60000ms;
+    --slider-accent-color: theme('colors.accent', #3b82f6);
+  }
+
+  @keyframes progress-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .animate-progress-fill {
+    animation: progress-grow var(--slider-progress-duration) linear infinite;
   }
 }
