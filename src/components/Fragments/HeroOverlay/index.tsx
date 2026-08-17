@@ -106,8 +106,8 @@ export function HeroOverlay() {
                           {/* Gradien diselaraskan dengan tema Emerald/Teal/Cyan globals.css */}
                           <linearGradient id="heroRailUnderline" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" stopColor="#059669" />
-                            <stop offset="50%" stopColor="#0d9488" />
-                            <stop offset="85%" stopColor="#0891b2" />
+                            <stop offset="50%" stopColor="#059669" />
+                            <stop offset="85%" stopColor="#059669" />
                             <stop offset="100%" stopColor="transparent" />
                           </linearGradient>
                         </defs>
@@ -130,10 +130,10 @@ export function HeroOverlay() {
                   </>
                 )}
               </span>
-              <span className="sr-only">
+              {/* <span className="sr-only">
                 {" "}
                 - {settings.role}{" "}| Go &amp; Next JS developer in Jakarta, Indonesia
-              </span>
+              </span> */}
             </h1>
             <div className="mt-1 flex items-baseline gap-2 truncate">
               <RoleTypewriter />
@@ -187,25 +187,29 @@ export function HeroOverlay() {
 function RoleTypewriter() {
   return (
     <span
-      role="img"
       className="relative inline-flex h-6 overflow-hidden align-baseline"
       aria-label={ROLES.join(", ")}
     >
       <span
         aria-hidden
         className="role-roll flex flex-col"
-        /* Menggunakan kustom properti & keyframe .role-roll dari globals.css */
-        style={{ "--role-rh": "1.5rem", "--role-dur": "10s" } as CSSProperties}
+        style={
+          {
+            "--role-rh": "24px",
+            "--role-dur": `${ROLES.length * 2.5}s`,
+          } as CSSProperties
+        }
       >
-        {ROLES.map((role) => (
+        {ROLES.map((role, idx) => (
           <span
-            key={role}
-            className="block h-6 leading-6 text-sm sm:text-base font-semibold text-gradient"
+            key={`${role}-${idx}`}
+            className="block h-6 whitespace-nowrap text-sm font-semibold leading-6 text-gradient sm:text-base"
           >
             {role}
           </span>
         ))}
-        <span className="block h-6 leading-6 text-sm sm:text-base font-semibold text-gradient">
+        {/* Item duplikat di akhir untuk animasi seamless wrap */}
+        <span className="block h-6 whitespace-nowrap text-sm font-semibold leading-6 text-gradient sm:text-base">
           {ROLES[0]}
         </span>
       </span>

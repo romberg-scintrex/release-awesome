@@ -42,7 +42,7 @@ export const SITE = {
   university: "Universitas Brawijaya",
   location: "Jakarta, Indonesia",
   email: "dimas.yudhana@gmail.com",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.grek.co.id",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://release-awesome.vercel.app",
   description: "Software engineer with a passion for building reliable, scalable and modern web applications.",
   social: {
     github: "https://github.com/dimasyudhana",
