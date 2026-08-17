@@ -74,25 +74,25 @@
     @apply backdrop-blur-2xl border border-white/15 bg-white/10 dark:bg-white/[0.06];
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-700 via-emerald-500 to-emerald-400;
   }
   .text-gradient-cool {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-emerald-400 to-emerald-300;
   }
   .text-gradient-strong {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    background-image: linear-gradient(to right, #059669, #0d9488 52%, #0891b2);
+    background-image: linear-gradient(to right, #047857, #059669 52%, #10b981);
   }
-  /* Hero display name — emerald ramp kept rich across every letter so
+  /* Hero display name — pure emerald ramp kept rich across every letter so
      it reads clearly against the stage instead of washing out. A slow
      position drift makes the gradient feel like living light. */
   .text-gradient-hero {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    background-image: linear-gradient(100deg, #047857 0%, #059669 22%, #0d9488 50%, #059669 78%, #047857 100%);
+    background-image: linear-gradient(100deg, #065f46 0%, #047857 22%, #059669 50%, #047857 78%, #065f46 100%);
     background-size: 220% 100%;
     background-position: 0% center;
     filter: drop-shadow(0 6px 16px rgba(4, 120, 87, 0.28));
@@ -341,22 +341,25 @@ html.lenis body {
   100% { transform: translateX(0); }
 }
 
-/* Vertical role roller */
+/* Vertical role roller - 3 Roles + 1 Seamless Loop */
 @keyframes role-roll {
-  0%,  20% { transform: translateY(0); }
-  25%, 45% { transform: translateY(calc(var(--role-rh) * -1)); }
-  50%, 70% { transform: translateY(calc(var(--role-rh) * -2)); }
-  75%, 95% { transform: translateY(calc(var(--role-rh) * -3)); }
-  100%     { transform: translateY(calc(var(--role-rh) * -4)); }
-}
-.role-roll {
-  animation: role-roll var(--role-dur, 10s) ease-in-out infinite;
-  will-change: transform;
-}
-@media (prefers-reduced-motion: reduce) {
-  .role-roll {
-    animation: none;
+  0%, 25% {
+    transform: translateY(0);
   }
+  33.33%, 58.33% {
+    transform: translateY(calc(var(--role-rh) * -1));
+  }
+  66.66%, 91.66% {
+    transform: translateY(calc(var(--role-rh) * -2));
+  }
+  100% {
+    transform: translateY(calc(var(--role-rh) * -3));
+  }
+}
+
+.role-roll {
+  animation: role-roll var(--role-dur, 7.5s) cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  will-change: transform;
 }
 
 /* ───────────────────────────────────────────────────────────────
@@ -599,5 +602,29 @@ html.lenis body {
 
   .animate-progress-fill {
     animation: progress-grow var(--slider-progress-duration) linear infinite;
+  }
+}
+
+@layer utilities {
+  /* Class pembungkus hairline grid border */
+  .hairline-grid {
+    @apply border border-ink-900/10 bg-ink-900/10 dark:border-white/10 dark:bg-white/10;
+  }
+  
+  /* Class hairline border biasa */
+  .hairline-border {
+    @apply border-ink-900/10 dark:border-white/10;
+  }
+}
+
+@layer base {
+  :root {
+    /* Spotlight color untuk Light Mode (misal: emerald soft atau neutral dark) */
+    --spotlight-color: rgba(16, 185, 129, 0.12);
+  }
+
+  .dark {
+    /* Spotlight color untuk Dark Mode */
+    --spotlight-color: rgba(16, 185, 129, 0.18);
   }
 }

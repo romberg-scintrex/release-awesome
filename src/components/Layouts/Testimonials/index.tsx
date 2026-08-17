@@ -23,53 +23,54 @@ export function Testimonials({ testimonials, heading }: TestimonialsProps) {
   if (testimonials.length === 0) return null;
 
   return (
-    // No `container` here — it now lives on the single inner wrapper below,
-    // so heading + grid share exactly one container instead of nesting two
-    // (which was doubling the horizontal padding/max-width and knocking the
-    // heading out of alignment with both the grid and SlideDesktop's heading).
     <section
-      className="relative w-screen min-h-screen flex flex-col justify-center border-y border-ink-900/10 py-16 sm:py-20 dark:border-white/10"
+      className="relative flex h-[100svh] min-h-[600px] w-full items-center justify-center overflow-hidden border-y border-ink-900/10 py-6 dark:border-white/10 md:py-8"
       aria-label={heading?.title ?? "Testimonials"}
     >
-      <div className="container">
+      <div className="container flex flex-col justify-center my-auto">
+        {/* Top Heading */}
         {heading && (
-          <SectionHeading
-            index={heading.index}
-            eyebrow={heading.eyebrow}
-            title={heading.title}
-            description={heading.description}
-            as={heading.headingAs ?? "h2"}
-          />
+          <div className="shrink-0 mb-6 md:mb-8">
+            <SectionHeading
+              index={heading.index}
+              eyebrow={heading.eyebrow}
+              title={heading.title}
+              description={heading.description}
+              as={heading.headingAs ?? "h2"}
+            />
+          </div>
         )}
 
-        <Reveal className={heading ? "mt-12" : ""}>
-          {/* hairline-divided grid: the px gaps reveal the container colour */}
-          <div className="grid gap-px overflow-hidden rounded-3xl border border-ink-900/10 bg-ink-900/10 dark:border-white/10 dark:bg-white/10 md:grid-cols-3">
+        {/* Content Area - Centered Grid */}
+        <Reveal className="w-full">
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-ink-900/10 bg-ink-900/10 dark:border-white/10 dark:bg-white/10 md:grid-cols-3 md:rounded-3xl">
             {testimonials.map((t, i) => (
               <SpotlightCard
                 as="figure"
                 key={t.name}
-                className="group flex h-full flex-col bg-white p-7 transition-colors duration-300 hover:bg-ink-50 sm:p-8 dark:bg-ink-900 dark:hover:bg-ink-800"
+                className="group flex flex-col justify-between bg-white p-5 transition-colors duration-300 hover:bg-ink-50 sm:p-6 lg:p-7 dark:bg-ink-900 dark:hover:bg-ink-800"
               >
-                <div className="flex items-start justify-between">
-                  <span className="font-mono text-[11px] tabular-nums text-ink-300 dark:text-ink-600">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span
-                    aria-hidden
-                    className="-mt-2 font-display text-5xl leading-none text-emerald-500/70 transition-transform duration-300 group-hover:-translate-y-0.5"
-                  >
-                    &rdquo;
-                  </span>
+                <div>
+                  <div className="flex items-start justify-between">
+                    <span className="font-mono text-[11px] tabular-nums text-ink-300 dark:text-ink-600">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="-mt-2 font-display text-3xl leading-none text-emerald-500/70 transition-transform duration-300 group-hover:-translate-y-0.5 lg:text-4xl"
+                    >
+                      &rdquo;
+                    </span>
+                  </div>
+
+                  <blockquote className="mt-2 text-xs leading-relaxed text-ink-800 line-clamp-4 sm:text-sm lg:mt-3 lg:text-base lg:line-clamp-6 dark:text-ink-100 text-balance">
+                    {t.quote}
+                  </blockquote>
                 </div>
 
-                <blockquote className="mt-4 flex-1 text-lg leading-relaxed text-ink-800 dark:text-ink-100 text-balance">
-                  {t.quote}
-                </blockquote>
-
-                <figcaption className="mt-6 border-t border-ink-900/10 pt-4 dark:border-white/10">
-                  <div className="text-sm font-semibold tracking-tight">{t.name}</div>
-                  <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-400">
+                <figcaption className="mt-4 border-t border-ink-900/10 pt-3 dark:border-white/10">
+                  <div className="text-xs font-semibold tracking-tight lg:text-sm">{t.name}</div>
+                  <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-ink-400 lg:text-[10px]">
                     {t.role}
                   </div>
                 </figcaption>
