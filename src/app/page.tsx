@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { HeroSection } from "@/components/Layouts/HeroSection";
 import { MarqueeTech } from "@/components/Layouts/MarqueeTech";
-import { SlideDesktop } from "@/components/Layouts/SliderDesktop";
+import { WritingSliderSection } from "@/components/Layouts/WritingSliderSection";
 import { Testimonials } from "@/components/Layouts/Testimonials";
 import { SITE, jsonLdHtml } from "@/lib/utils";
 import { getSettings, getTestimonials, getTools } from "@/lib/queries";
@@ -61,7 +61,7 @@ export default async function Home() {
       <MarqueeTech 
         tools={tools}
       />
-      <SlideDesktop 
+      <WritingSliderSection 
         slides={defaultSlides}
         heading={{
           index: "01",

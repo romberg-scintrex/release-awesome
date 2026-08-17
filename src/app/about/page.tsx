@@ -30,22 +30,20 @@ export default async function AboutPage() {
 
   return (
     <>
-      {/* 1. Interactive GSAP Scrollytelling Section */}
+      {/* Self-contained Section */}
       {scenes && scenes.length > 0 && (
-        <section>
-          <ScrollyTelling
-            scenes={scenes}
-            avatarUrl={avatarUrl}
-            portraitName={settings.shortName}
-            portraitRole={settings.role.split(" ")[0].toUpperCase()}
-            portraitTag={`UB · '14`}
-            portraitChip="Go · NextJS · Docker"
-          />
-        </section>
+        <ScrollyTelling
+          scenes={scenes}
+          avatarUrl={avatarUrl}
+          portraitName={settings.shortName}
+          portraitRole={settings.role.split(" ")[0].toUpperCase()}
+          portraitTag={`UB · '14`}
+          portraitChip="Go · NextJS · Docker"
+        />
       )}
 
-      {/* 2. Timeline Experience & Education dengan Parallax Effect */}
-      <section className="container relative z-20 py-20 sm:py-28">
+      {/* Container untuk Heading & Timeline */}
+      <div id="timeline" className="container relative z-20 py-20 sm:py-28 scroll-mt-20">
         <Parallax offset={20}>
           <SectionHeading
             index="02"
@@ -56,9 +54,10 @@ export default async function AboutPage() {
         </Parallax>
 
         <Parallax offset={36} className="mt-12">
+          {/* Self-contained Section dengan border-y */}
           <Timeline />
         </Parallax>
-      </section>
+      </div>
     </>
   );
 }

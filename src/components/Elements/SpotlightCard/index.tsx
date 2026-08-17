@@ -6,20 +6,15 @@ import { cn } from "@/lib/utils";
 interface SpotlightCardProps {
   className?: string;
   as?: "div" | "figure" | "article" | "li";
-  /** CSS color of the spotlight tint */
+  /** Optional custom CSS color/variable string, defaults to CSS variable --spotlight-color */
   color?: string;
 }
 
-/**
- * Card with a soft radial highlight that tracks the cursor — the classic
- * modern-portfolio "spotlight" hover. Position is written to CSS variables
- * directly (no React re-renders per mousemove); inert on touch devices.
- */
 export function SpotlightCard({
   children,
   className,
   as = "div",
-  color = "rgba(139, 92, 246, 0.10)",
+  color,
 }: PropsWithChildren<SpotlightCardProps>) {
   const ref = useRef<HTMLDivElement | null>(null);
   const Tag = as as "div";
@@ -32,6 +27,9 @@ export function SpotlightCard({
     el.style.setProperty("--spot-y", `${e.clientY - rect.top}px`);
   }
 
+  // Jika prop color dikirim, gunakan nilainya; jika tidak, fallback ke --spotlight-color di globals.css
+  const spotlightColor = color ?? "var(--spotlight-color, rgba(16, 185, 129, 0.12))";
+
   return (
     <Tag ref={ref} onMouseMove={onMove} className={cn("group/spot relative", className)}>
       {children}
@@ -39,7 +37,7 @@ export function SpotlightCard({
         aria-hidden
         className="hide-on-touch pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/spot:opacity-100"
         style={{
-          background: `radial-gradient(320px circle at var(--spot-x, 50%) var(--spot-y, 50%), ${color}, transparent 70%)`,
+          background: `radial-gradient(320px circle at var(--spot-x, 50%) var(--spot-y, 50%), ${spotlightColor}, transparent 70%)`,
         }}
       />
     </Tag>
