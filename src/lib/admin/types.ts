@@ -35,7 +35,7 @@ export interface SettingsInput {
   university: string;
   location: string;
   email: string;
-  url: string;
+  url?: string;
   description: string;
   social: {
     github: string;

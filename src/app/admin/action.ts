@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import type { ToolInput } from "@/lib/admin/types";
+import type { ToolInput, SettingsInput } from "@/lib/admin/types";
 
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
@@ -153,4 +153,39 @@ function revalidateTools() {
   revalidatePath("/tools");
   revalidatePath("/tools/[slug]", "page");
   revalidatePath("/admin/tools");
+}
+
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+export async function updateSettings(input: SettingsInput): Promise<ActionResult> {
+  const { supabase, user } = await requireAdmin();
+  if (!user) return { ok: false, error: NOT_AUTHORIZED };
+  const { error } = await supabase
+    .from("site_settings")
+    .upsert({
+      id: 1,
+      name: input.name,
+      short_name: input.shortName,
+      role: input.role,
+      university: input.university,
+      location: input.location,
+      email: input.email,
+      description: input.description,
+      social_github: input.social.github,
+      social_linkedin: input.social.linkedin,
+      social_facebook: input.social.facebook,
+      social_instagram: input.social.instagram,
+      hero_back_url: input.heroBackURL,
+      hero_front_url: input.heroFrontURL,
+      hero_mobile_url: input.heroMobileURL,
+      about_image_url: input.aboutImageURL,
+      cv_url: input.cvURL,
+      home_show_tools: input.homeShowTools,
+      home_show_blog: input.homeShowBlog,
+      stats: input.stat,
+    });
+  if (error) return { ok: false, error: error.message };
+  // Settings affect the whole site (layout, heroes, footer).
+  revalidatePath("/", "layout");
+  return { ok: true };
 }

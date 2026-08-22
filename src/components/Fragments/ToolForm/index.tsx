@@ -33,7 +33,7 @@ function slugify(s: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-export function ToolForm({ initial }: { initial?: Tool }) {
+export function ToolForm({ initial, userId }: { initial?: Tool; userId: string }) {
   const router = useRouter();
   const editing = Boolean(initial);
 
@@ -207,7 +207,7 @@ export function ToolForm({ initial }: { initial?: Tool }) {
             label="Tool icon (marquee & logo)"
             value={iconUrl}
             onChange={setIconUrl}
-            folder="tools/icons"
+            userId={userId}
             accept="image/*"
             hint="Upload a square icon/logo (e.g. 48×48 or SVG/PNG)."
           />
@@ -215,7 +215,7 @@ export function ToolForm({ initial }: { initial?: Tool }) {
             label="Cover image (card + social preview)"
             value={coverUrl}
             onChange={setCoverUrl}
-            folder="tools/covers"
+            userId={userId}
             accept="image/*"
             hint="Optional. 1200×630 works well. Falls back to the gradient below."
           />
