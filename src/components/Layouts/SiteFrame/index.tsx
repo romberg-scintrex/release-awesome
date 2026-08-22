@@ -11,39 +11,45 @@ import { CommandPalette } from "@/components/Elements/CommandPalette";
 import { RouteProgress } from "@/components/Elements/RouteProgress";
 import { ScrollTop } from "@/components/Elements/ScrollTop";
 import { ScrollSmooth } from "@/components/Elements/ScrollSmooth";
-import type { SiteSettings } from "@/lib/types";
+import { useProfile } from "@/components/Elements/Providers/ProfileProvider";
+import type { Profile, SiteSettings } from "@/lib/types";
+
+interface SiteFrameProps {
+  settings: SiteSettings;
+  profile?: Profile;
+  children: ReactNode;
+}
 
 /**
  * Renders the public marketing chrome (nav, footer, cursor, command palette,
- * page transitions). On /admin it renders children bare so the dashboard has
- * its own shell — and none of this client machinery mounts there.
+ * page transitions). Consumes profile either via props or ProfileContext.
  */
 export function SiteFrame({
   settings,
+  profile: propProfile,
   children,
-}: Readonly<{
-  settings: SiteSettings;
-  children: ReactNode;
-}>) {
+}: Readonly<SiteFrameProps>) {
   const pathname = usePathname();
+  const contextProfile = useProfile();
+  
+  // Memprioritaskan prop profile jika dipass langsung, jika tidak gunakan dari context
+  const profile = propProfile ?? contextProfile;
 
   if (pathname?.startsWith("/admin")) {
     return <>{children}</>;
   }
 
   return (
-    // reducedMotion="user" makes framer-motion honor the OS setting globally —
-    // a no-op for everyone else, reduced/instant transitions for those who ask.
     <MotionConfig reducedMotion="user">
       <ScrollSmooth />
       <RouteProgress />
       <CustomCursor />
-      <Navbar />
+      <Navbar profile={profile} />
       <CommandPalette />
       <PageTransition>
         <main className="relative">{children}</main>
       </PageTransition>
-      <Footer settings={settings} />
+      <Footer settings={settings} profile={profile} />
       <ScrollTop />
     </MotionConfig>
   );

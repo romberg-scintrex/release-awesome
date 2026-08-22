@@ -4,6 +4,7 @@ import { ExternalLink, LogOut } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { NavbarAdmin } from "@/components/Layouts/AdminNavbar";
 import { createClient } from "@/lib/supabase/server";
+import { getVisibleNavItems } from "@/lib/casbin/enforcer";
 import { signOut } from "./action";
 
 export const metadata: Metadata = {
@@ -25,41 +26,53 @@ export default async function AdminLayout( {children}: {children: React.ReactNod
     return <div className="min-h-screen bg-[rgb(var(--bg))]">{children}</div>;
   }
 
+  const visibleItems = await getVisibleNavItems(user.email ?? "");
+
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))]">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 lg:flex-row lg:px-8">
         <aside className="lg:w-60 lg:shrink-0">
-          <div className="lg-sticky lg:top-8">
-            <Link href="/admin" className="flex item-center gap-2.5">
-              <span className="font-display text-lg font-semibold">Admin Logo</span>
+          <div className="lg:sticky lg:top-8">
+            <Link href="/admin" className="flex items-center gap-2.5 px-2.5">
+              <span className="font-display text-lg font-semibold text-ink-950 dark:text-white">
+                Admin Logo
+              </span>
             </Link>
-            <NavbarAdmin />
-            <div className="mt-6 space-y-2 border-t border-black/10 pt-4 dark:border-white/10">
-              <p className="truncate px-2 text-xs text-ink-400">{user.email}</p>
+
+            <NavbarAdmin visibleItems={visibleItems} />
+
+            <div className="mt-6 space-y-1 border-t border-black/10 pt-4 dark:border-white/10">
+              <p className="truncate px-2.5 text-xs text-ink-400 dark:text-ink-400">
+                {user.email}
+              </p>
+              
               <Link
                 href="/"
                 target="_blank"
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-ink-500 transition-colors hover:bg-black/5 hover:text-ink-950 dark:hover:bg-white/5 dark:hover:text-white"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-ink-500 transition-colors hover:bg-black/[0.04] hover:text-ink-950 dark:text-ink-300 dark:hover:bg-white/5 dark:hover:text-white"
               >
-              <ExternalLink size={15} />
+                <ExternalLink size={16} />
                 View site
               </Link>
+
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-ink-500 transition-colors hover:bg-rose-500/10 hover:text-rose-500"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-ink-500 transition-colors hover:bg-rose-500/10 hover:text-rose-500 dark:text-ink-300 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
                 >
-                  <LogOut size={15} />
+                  <LogOut size={16} />
                   Sign out
                 </button>
               </form>
             </div>
           </div>
         </aside>
+
         <main className="min-w-0 flex-1">{children}</main>
       </div>
     </div>
-  )
+  );
 }
 
 

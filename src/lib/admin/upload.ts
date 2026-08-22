@@ -4,11 +4,15 @@ import { SUPABASE_MEDIA_BUCKET } from "@/lib/supabase/config";
 /**
  * Uploads a file to Supabase Storage (as the logged-in admin) and returns its
  * public URL. Called from admin client components only.
+ *
+ * @param file - The file to upload.
+ * @param userId - The authenticated user's ID (auth.uid()). Used as the path
+ *   prefix to isolate uploads per tenant: `{userId}/{uuid}.{ext}`.
  */
-export async function uploadFile(file: File, folder: string): Promise<string> {
+export async function uploadFile(file: File, userId: string): Promise<string> {
   const supabase = createClient();
   const ext = file.name.includes(".") ? file.name.split(".").pop() : "bin";
-  const path = `${folder}/${crypto.randomUUID()}.${ext}`;
+  const path = `${userId}/${crypto.randomUUID()}.${ext}`;
 
   const { error } = await supabase.storage.from(SUPABASE_MEDIA_BUCKET).upload(path, file, {
     cacheControl: "3600",

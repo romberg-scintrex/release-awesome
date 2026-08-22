@@ -72,7 +72,7 @@ Perbaikan best practice untuk portfolio site, mencakup aksesibilitas (ARIA), per
   - [x] 9.1 Ganti header key dari `"Content-Security-Policy-Report-Only"` menjadi `"Content-Security-Policy"`
   - [x] 9.2 Jalankan `npm run build`
 
-- [-] 10. Lighthouse verification & skor final
+- [ ] 10. Lighthouse verification & skor final
   - **Refs**: REQ-NF1
   - **Depends on**: Task 1, Task 2, Task 3, Task 4, Task 5, Task 6, Task 7, Task 9
   - [x] 10.1 Jalankan `npm run test` — semua passing
