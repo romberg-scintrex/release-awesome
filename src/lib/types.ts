@@ -134,3 +134,42 @@ export interface AboutScene {
   button_label: string | null;
   button_url: string | null;
 }
+
+export interface Profile {
+  id: string;               // UUID = auth.users.id
+  username: string;
+  name: string;
+  shortName: string;
+  role: string;
+  university: string;
+  location: string;
+  email: string;
+  description: string;
+  social: {
+    github: string;
+    linkedin: string;
+    facebook: string;
+    instagram: string;
+  };
+  heroBackURL: string | null;
+  heroFrontURL: string | null;
+  heroMobileURL: string | null;
+  aboutImageURL: string | null;
+  cvURL: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BlogPost {
+  id: string;
+  userId: string;
+  slug: string;
+  title: string;
+  summary: string;
+  content: string;       // Markdown
+  coverUrl: string | null;
+  published: boolean;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

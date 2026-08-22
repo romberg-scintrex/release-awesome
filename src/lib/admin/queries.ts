@@ -8,11 +8,11 @@ import type {
 import {
   mapProjectRow,
   mapTestimonialRow,
-  mapSettingsRow,
   mapPostRow,
   mapToolRow,
   defaultSettings,
 } from "@/lib/queries"
+import { defaultStats } from "@/lib/default";
 import type { Project, Testimonial, SiteSettings, Post, Tool } from "@/lib/types";
 
 type ActionResult = { ok: boolean; error?: string };
@@ -128,14 +128,65 @@ export async function setTestimonialPublished(id: string, published: boolean): P
   return { ok: true };
 }
 
-export async function getSettingsForAdmin() : Promise<SiteSettings> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("site_settings")
-    .select("*")
-    .eq("id", 1)
-    .maybeSingle();
-  return data ? mapSettingsRow(data) : defaultSettings;
+export async function getSettingsForAdmin(): Promise<SiteSettings> {
+  try {
+    const { supabase, user } = await requireAdmin();
+    if (!user) return defaultSettings;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error || !data) return defaultSettings;
+
+    const row = data as {
+      name: string;
+      short_name: string;
+      role: string;
+      university: string;
+      location: string;
+      email: string;
+      description: string;
+      social_github: string;
+      social_linkedin: string;
+      social_facebook: string;
+      social_instagram: string;
+      hero_back_url: string | null;
+      hero_front_url: string | null;
+      hero_mobile_url: string | null;
+      about_image_url: string | null;
+      cv_url: string | null;
+    };
+
+    return {
+      name: row.name,
+      shortName: row.short_name,
+      role: row.role,
+      university: row.university,
+      location: row.location,
+      email: row.email,
+      url: "",
+      description: row.description,
+      social: {
+        github: row.social_github,
+        linkedin: row.social_linkedin,
+        facebook: row.social_facebook,
+        instagram: row.social_instagram,
+      },
+      heroBackURL: row.hero_back_url,
+      heroFrontURL: row.hero_front_url,
+      heroMobileURL: row.hero_mobile_url,
+      aboutImageURL: row.about_image_url,
+      cvURL: row.cv_url,
+      homeShowTools: true,
+      homeShowBlog: true,
+      stats: defaultStats,
+    };
+  } catch {
+    return defaultSettings;
+  }
 }
 
 export async function getListPosts(): Promise<Post[]> {
