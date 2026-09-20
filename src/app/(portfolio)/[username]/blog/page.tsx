@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image"
 import { notFound } from "next/navigation";
 import { SectionHeading } from "@/components/Fragments/SectionHeading";
 import { GradientMesh } from "@/components/Elements/GradientMesh";
-import { Reveal, RevealStagger, RevealItem } from "@/components/Elements/Reveal";
+import { RevealStagger, RevealItem } from "@/components/Elements/Reveal";
 import { SITE } from "@/lib/utils";
 import { getProfileByUsername, getBlogsByUsername } from "@/lib/queries-by-user";
 
@@ -61,20 +62,13 @@ export default async function UserBlogPage({ params }: PageProps) {
 
       {/* Blog post grid */}
       <section className="container pb-24 sm:pb-32">
-        {posts.length === 0 ? (
-          <Reveal>
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className="text-lg text-ink-400">No posts published yet.</p>
-            </div>
-          </Reveal>
-        ) : (
           <RevealStagger className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => (
               <RevealItem key={post.id}>
                 <article className="group flex h-full flex-col rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-ink-900 overflow-hidden transition-shadow hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/40">
                   {post.coverUrl && (
                     <div className="overflow-hidden">
-                      <img
+                      <Image
                         src={post.coverUrl}
                         alt={post.title}
                         className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
@@ -112,7 +106,6 @@ export default async function UserBlogPage({ params }: PageProps) {
               </RevealItem>
             ))}
           </RevealStagger>
-        )}
       </section>
     </div>
   );
