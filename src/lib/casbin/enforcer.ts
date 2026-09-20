@@ -111,13 +111,17 @@ export async function getVisibleNavItems(userEmail: string): Promise<NavItemKey[
     const enforcer = await createEnforcerForRequest();
     if (!enforcer) return ["dashboard"];
 
+    console.log("DEBUG User Email:", userEmail);
+
     const visible: NavItemKey[] = [];
     for (const item of ALL_NAV_ITEMS) {
       const allowed = await enforcer.enforce(userEmail, item, "read");
+      console.log(`Checking ${userEmail} -> ${item}: ${allowed}`);
       if (allowed) visible.push(item);
     }
     return visible.length > 0 ? visible : ["dashboard"];
-  } catch {
+  } catch (err) {
+    console.error("Casbin error:", err);
     return ["dashboard"];
   }
 }
