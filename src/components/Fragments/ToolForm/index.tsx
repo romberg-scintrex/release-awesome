@@ -9,6 +9,7 @@ import { createTool, updateTool } from "@/app/admin/action";
 import { TOOL_COMPONENTS } from "@/lib/tools/registry";
 import { MediaUpload } from "@/components/Fragments/MediaUpload";
 import { cn } from "@/lib/utils";
+import { slugify } from "@/lib/slug";
 
 const GRADIENTS = [
   "from-brand-cyan via-brand-violet to-brand-fuchsia",
@@ -25,13 +26,6 @@ const labelCls = "mb-1.5 block text-xs font-medium uppercase tracking-[0.14em] t
 const card =
   "rounded-2xl border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-ink-900";
 
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 export function ToolForm({ initial, userId }: { initial?: Tool; userId: string }) {
   const router = useRouter();

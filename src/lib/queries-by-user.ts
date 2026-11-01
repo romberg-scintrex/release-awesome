@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from "@/lib/supabase/config";
-import type { Profile, BlogPost, Project, Testimonial, AboutScene, Tool, ToolKind } from "@/lib/types";
+import type { Profile, ProfileStatus, BlogPost, Project, Testimonial, AboutScene, Tool, ToolKind } from "@/lib/types";
 import { mapProjectRow, mapTestimonialRow, mapAboutSceneRow, type ProjectRow, type TestimonialRow, type AboutSceneRow } from "@/lib/queries";
 
 // ─── 4.1  ProfileRow + mapProfileRow ─────────────────────────────────────────
@@ -9,6 +9,8 @@ import { mapProjectRow, mapTestimonialRow, mapAboutSceneRow, type ProjectRow, ty
 export interface ProfileRow {
   id: string;
   username: string;
+  /** Added by migration 0006; absent on a database still at 0005. */
+  status?: string | null;
   name: string;
   short_name: string;
   role: string;
@@ -29,10 +31,19 @@ export interface ProfileRow {
   updated_at: string;
 }
 
+/** Only the three known values map through; anything else is treated as pending. */
+function toProfileStatus(value: string | null | undefined): ProfileStatus {
+  // Defaults to "pending" deliberately. A row whose status we cannot read must
+  // not be published by accident, and a database still at 0005 has no column
+  // at all - so the conservative direction is the only safe one.
+  return value === "approved" || value === "rejected" ? value : "pending";
+}
+
 export function mapProfileRow(r: ProfileRow): Profile {
   return {
     id: r.id,
     username: r.username,
+    status: toProfileStatus(r.status),
     name: r.name,
     shortName: r.short_name,
     role: r.role,
@@ -150,9 +161,54 @@ export const getProfileByUsername = cache(async (username: string): Promise<Prof
       .eq("username", username)
       .maybeSingle();
     if (error || !data) return null;
-    return mapProfileRow(data as ProfileRow);
+
+    const profile = mapProfileRow(data as ProfileRow);
+
+    // Approval gate, applied here rather than per-route. Migration 0006 narrows
+    // the anonymous RLS policy to status = 'approved', so in a migrated
+    // database this never fires - but every one of this function's call sites is
+    // a public tenant read, across six files and twelve places including each
+    // generateMetadata, and one omission would serve an unapproved portfolio.
+    if (profile.status !== "approved") {
+      if ((data as ProfileRow).status === undefined) {
+        // Conservative on purpose: an absent column means we cannot tell who is
+        // approved, and publishing by default would silently disable the only
+        // control against username squatting. Loud, because the symptom - every
+        // portfolio 404s - is otherwise baffling.
+        console.error(
+          "[profiles] no `status` column: apply supabase/migrations/0006_platform_signup.sql. " +
+            "Every tenant portfolio will 404 until it is applied.",
+        );
+      }
+      return null;
+    }
+
+    return profile;
   } catch {
     return null;
+  }
+});
+
+/**
+ * A handful of approved profiles, for the platform homepage showcase.
+ *
+ * Ordered newest first so the page changes as the platform grows. Returns `[]`
+ * rather than throwing, so the homepage renders with nothing to show rather
+ * than not at all - it has no other dependency on the database.
+ */
+export const getApprovedProfiles = cache(async (limit = 6): Promise<Profile[]> => {
+  if (!isSupabaseConfigured) return [];
+  try {
+    const { data, error } = await anon()
+      .from("profiles")
+      .select("*")
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error || !data) return [];
+    return (data as ProfileRow[]).map(mapProfileRow);
+  } catch {
+    return [];
   }
 });
 
@@ -196,6 +252,36 @@ export const getToolsByUsername = cache(async (username: string): Promise<Tool[]
     return [];
   }
 });
+
+/**
+ * One published tool of one tenant.
+ *
+ * Needed because `tools` is unique on `(user_id, slug)`, not on `slug` alone -
+ * so `getToolBySlug()` in queries.ts, a single-owner lookup, would happily
+ * return a *different* tenant's tool for the same slug.
+ */
+export const getToolByUsernameAndSlug = cache(
+  async (username: string, slug: string): Promise<Tool | null> => {
+    if (!isSupabaseConfigured) return null;
+    try {
+      // Resolves the approval gate for free: getProfileByUsername returns null
+      // for anything that is not approved.
+      const profile = await getProfileByUsername(username);
+      if (!profile) return null;
+      const { data, error } = await anon()
+        .from("tools")
+        .select("*")
+        .eq("user_id", profile.id)
+        .eq("slug", slug)
+        .eq("published", true)
+        .maybeSingle();
+      if (error || !data) return null;
+      return mapToolRow(data as ToolRow);
+    } catch {
+      return null;
+    }
+  },
+);
 
 export const getTestimonialsByUsername = cache(async (username: string): Promise<Testimonial[]> => {
   if (!isSupabaseConfigured) return [];

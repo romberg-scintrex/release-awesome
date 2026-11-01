@@ -2,8 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Check, Plus, Trash2 } from "lucide-react";
-import type { SiteSettings, Stat } from "@/lib/types";
+import { Loader2, Check } from "lucide-react";
+import type { SiteSettings } from "@/lib/types";
 import type { SettingsInput } from "@/lib/admin/types";
 import { updateSettings } from "@/app/admin/action";
 import { MediaUpload } from "@/components/Fragments/MediaUpload";
@@ -36,20 +36,8 @@ export function SettingsForm({ initial, userId }: { initial: SiteSettings; userI
   const [aboutImageURL, setAboutImageURL] = useState<string | null>(initial.aboutImageURL);
   const [cvURL, setCvURL] = useState<string | null>(initial.cvURL);
 
-  const [homeShowTools, setHomeShowTools] = useState(initial.homeShowTools);
-  const [homeShowBlog, setHomeShowBlog] = useState(initial.homeShowBlog);
 
-  const [stats, setStats] = useState<Stat[]>(initial.stats);
 
-  function updateStat(i: number, patch: Partial<Stat>) {
-    setStats((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
-  }
-  function addStat() {
-    setStats((prev) => [...prev, { value: 0, suffix: "", label: "New stat" }]);
-  }
-  function removeStat(i: number) {
-    setStats((prev) => prev.filter((_, idx) => idx !== i));
-  }
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -75,13 +63,6 @@ export function SettingsForm({ initial, userId }: { initial: SiteSettings; userI
       heroMobileURL,
       aboutImageURL,
       cvURL,
-      homeShowTools,
-      homeShowBlog,
-      stat: stats.map((s) => ({
-        value: Number.isFinite(Number(s.value)) ? Number(s.value) : 0,
-        suffix: s.suffix,
-        label: s.label,
-      })),
     };
 
     const res = await updateSettings(payload);
@@ -124,6 +105,10 @@ export function SettingsForm({ initial, userId }: { initial: SiteSettings; userI
           <div>
             <label className={labelCls}>Email</label>
             <input className={input} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <p className="mt-1.5 text-xs text-ink-400">
+              Shown publicly on your portfolio. Messages from your contact form go to
+              the address you sign in with, not to this one.
+            </p>
           </div>
           <div className="sm:col-span-2">
             <label className={labelCls}>Bio / description</label>
@@ -212,96 +197,6 @@ export function SettingsForm({ initial, userId }: { initial: SiteSettings; userI
       </div>
 
       {/* Home page sections */}
-      <div className={card}>
-        <h2 className="font-display text-lg font-semibold">Home page sections</h2>
-        <p className="mt-1 text-sm text-ink-400">
-          Show Tools and Blog sections on the homepage. Each section displays the items you mark
-          as <span className="font-medium text-ink-600 dark:text-ink-300">Featured</span> (in
-          Tools / Blog). Untick to hide a whole section.
-        </p>
-        <div className="mt-4 space-y-3">
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={homeShowTools}
-              onChange={(e) => setHomeShowTools(e.target.checked)}
-              className="h-4 w-4 rounded"
-            />
-            <span className="text-sm">Show the Tools section on the homepage</span>
-          </label>
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={homeShowBlog}
-              onChange={(e) => setHomeShowBlog(e.target.checked)}
-              className="h-4 w-4 rounded"
-            />
-            <span className="text-sm">Show the Blog section on the homepage</span>
-          </label>
-        </div>
-      </div>
-
-      {/* About — headline stats */}
-      <div className={card}>
-        <h2 className="font-display text-lg font-semibold">About - headline stats</h2>
-        <p className="mt-1 text-sm text-ink-400">
-          The animated numbers in the “About” block on the homepage (GPA, projects shipped, …).
-          <span className="font-medium text-ink-600 dark:text-ink-300"> Value</span> is the number
-          that counts up; <span className="font-medium text-ink-600 dark:text-ink-300">Suffix</span> is
-          appended after it (e.g. <code className="rounded bg-black/5 px-1 dark:bg-white/10">+</code>,
-          <code className="rounded bg-black/5 px-1 dark:bg-white/10">k</code>, or
-          <code className="rounded bg-black/5 px-1 dark:bg-white/10"> / 4.0</code>).
-        </p>
-        <div className="mt-4 space-y-3">
-          {stats.map((s, i) => (
-            <div key={i} className="grid grid-cols-[5rem_5rem_1fr_auto] items-end gap-2 sm:grid-cols-[6rem_6rem_1fr_auto]">
-              <div>
-                {i === 0 && <label className={labelCls}>Value</label>}
-                <input
-                  className={input}
-                  type="number"
-                  step="any"
-                  value={s.value}
-                  onChange={(e) => updateStat(i, { value: e.target.value === "" ? 0 : Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                {i === 0 && <label className={labelCls}>Suffix</label>}
-                <input
-                  className={input}
-                  value={s.suffix}
-                  onChange={(e) => updateStat(i, { suffix: e.target.value })}
-                />
-              </div>
-              <div>
-                {i === 0 && <label className={labelCls}>Label</label>}
-                <input
-                  className={input}
-                  value={s.label}
-                  onChange={(e) => updateStat(i, { label: e.target.value })}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => removeStat(i)}
-                aria-label="Remove stat"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-black/10 text-ink-400 transition-colors hover:border-rose-500/40 hover:text-rose-500 dark:border-white/10"
-              >
-                <Trash2 size={15} />
-              </button>
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={addStat}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-xl border border-black/10 px-3 py-2 text-sm font-medium text-ink-600 transition-colors hover:border-accent/50 hover:text-accent dark:border-white/10 dark:text-ink-300"
-        >
-          <Plus size={15} />
-          Add stat
-        </button>
-      </div>
-
       {error && (
         <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-600 dark:text-rose-300">
           {error}

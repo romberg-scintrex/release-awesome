@@ -7,7 +7,11 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isAdmin = pathname.startsWith("/admin");
-  const isLogin = pathname.startsWith("/admin/login");
+  // /admin/login is a permanent-redirect stub to /login. Excluded from the
+  // auth gate below so that redirect can actually run instead of the gate
+  // bouncing the request first.
+  const isLegacyLogin = pathname === "/admin/login" || pathname.startsWith("/admin/login/");
+  const isAuthRoute = pathname === "/login" || pathname === "/register";
 
   if (!isSupabaseConfigured) {
     // not configured, so don't try to update the session
@@ -36,14 +40,19 @@ export async function updateSession(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (isAdmin && !user && !isLogin) {
+  // Unauthenticated into the CMS - send them to sign in, remembering where
+  // they were headed, query string included.
+  if (isAdmin && !user && !isLegacyLogin) {
+    const target = `${pathname}${request.nextUrl.search}`;
     const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.searchParams.set("redirect", pathname);
+    url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("redirect", target);
     return NextResponse.redirect(url);
   }
 
-  if (isLogin && user) {
+  // Already signed in - nothing to do on the auth pages.
+  if ((isAuthRoute || isLegacyLogin) && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     url.search = "";

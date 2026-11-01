@@ -8,8 +8,13 @@ import { Field } from "@/components/Elements/Field";
 import { useContactForm } from "@/hooks/useContactForm";
 import { cn, inputClasses } from "@/lib/utils";
 
-export function ContactForm() {
-  const [state, actions] = useContactForm();
+export function ContactForm({
+  username,
+}: Readonly<{
+  /** Tenant this form belongs to. Omit on the platform-level form at /contact. */
+  username?: string;
+}> = {}) {
+  const [state, actions] = useContactForm(username);
   const { fields, status, errorMsg } = state;
 
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;

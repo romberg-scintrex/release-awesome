@@ -57,7 +57,22 @@ export function TestimonialRowWithActions({ item }: { item: Testimonial }) {
   }
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-ink-900">
+    <div
+      className={cn(
+        "rounded-2xl border bg-white p-4 dark:bg-ink-900",
+        // Keyed off the persisted item, not the `published` toggle below, so a
+        // draft stays marked while the editor is mid-edit and hasn't saved yet.
+        item.published
+          ? "border-black/10 dark:border-white/10"
+          : "border-amber-500/40 dark:border-amber-400/30",
+      )}
+    >
+      {!item.published && (
+        <p className="mb-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-2 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-amber-700 dark:text-amber-400">
+          <EyeOff size={12} />
+          Not published
+        </p>
+      )}
       <textarea
         rows={3}
         value={quote}
