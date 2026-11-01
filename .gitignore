@@ -35,6 +35,12 @@ yarn-error.log*
 .env.local
 .env.sonar
 
+# large 3d/media source assets - these belong in Supabase Storage, not the repo.
+# public/models/barong.glb is 78 MB; committing it would bloat history permanently
+# and breach Vercel's deployment size limit. See
+# .claude/specs/landing-3d-experience/ for the compression pipeline.
+/public/models/
+
 # vercel
 .vercel
 

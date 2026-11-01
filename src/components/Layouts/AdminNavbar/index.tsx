@@ -6,16 +6,14 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   FolderGit2,
+  Newspaper,
   MessageSquareQuote,
   Settings,
-  Newspaper,
   Wrench,
-  User,
   ChevronDown,
   LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { NavItemKey } from "@/lib/casbin/enforcer";
 
 interface NavChild {
   href: string;
@@ -28,39 +26,45 @@ interface NavItem {
   label: string;
   Icon: LucideIcon;
   exact?: boolean;
+  /**
+   * No item uses this today - the only group was About, whose two children do
+   * not exist yet. The machinery stays because that section returns with
+   * specs/admin-content-crud, and rebuilding it would be pure churn.
+   */
   children?: NavChild[];
-  key?: NavItemKey;
 }
 
-interface NavbarAdminProps {
-  visibleItems: NavItemKey[];
-}
-
-const ITEMS: NavItem[] = [
-  { href: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true, key: "dashboard" },
-  {
-    label: "About",
-    Icon: User,
-    key: "about",
-    children: [
-      { href: "/admin/about/section1", label: "Biography", exact: true },
-      { href: "/admin/about/section2", label: "Timeline", exact: true },
-    ],
-  },
-  { href: "/admin/projects", label: "Projects", Icon: FolderGit2, exact: false, key: "projects" },
-  { href: "/admin/blog", label: "Blog", Icon: Newspaper, exact: false, key: "blog" },
-  { href: "/admin/tools", label: "Tools", Icon: Wrench, exact: false, key: "tools" },
-  { href: "/admin/testimonials", label: "Testimonials", Icon: MessageSquareQuote, exact: false, key: "testimonials" },
-  { href: "/admin/settings", label: "Settings", Icon: Settings, exact: false, key: "settings" },
+/**
+ * Every tenant sees the same items; RLS scopes what they can touch.
+ *
+ * Casbin used to filter this list, and because an unmatched subject fell back
+ * to ["dashboard"] it also hid the entries that pointed nowhere. With it gone,
+ * a link that 404s is just a trap - so **this list contains only routes that
+ * exist**, and adding one is part of building its page.
+ *
+ * Projects and Blog returned on 2026-11-01 with specs/admin-content-crud
+ * tasks 5.1-5.4. Still absent, because their pages still do not exist:
+ *
+ *   /admin/about/section1,2    Biography / Timeline
+ *
+ * src/components/Layouts/AdminNavbar/index.test.ts asserts every href here
+ * resolves to a real page, so re-adding one early fails CI.
+ */
+export const ADMIN_NAV_ITEMS: NavItem[] = [
+  { href: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true },
+  { href: "/admin/projects", label: "Projects", Icon: FolderGit2, exact: false },
+  { href: "/admin/blog", label: "Blog", Icon: Newspaper, exact: false },
+  { href: "/admin/tools", label: "Tools", Icon: Wrench, exact: false },
+  { href: "/admin/testimonials", label: "Testimonials", Icon: MessageSquareQuote, exact: false },
+  { href: "/admin/settings", label: "Settings", Icon: Settings, exact: false },
 ];
 
-export function NavbarAdmin({ visibleItems }: NavbarAdminProps) {
+export function NavbarAdmin() {
   const pathname = usePathname();
-  const filteredItems = ITEMS.filter((item) => item.key && visibleItems.includes(item.key));
 
   return (
     <nav className="mt-6 space-y-1">
-      {filteredItems.map((item) => {
+      {ADMIN_NAV_ITEMS.map((item) => {
         if (item.children) {
           return <NavGroup key={item.label} item={item} pathname={pathname} />;
         }
@@ -73,6 +77,7 @@ export function NavbarAdmin({ visibleItems }: NavbarAdminProps) {
           <Link
             key={item.href}
             href={item.href!}
+            aria-current={active ? "page" : undefined}
             className={cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors",
               active
@@ -130,6 +135,7 @@ function NavGroup({ item, pathname }: { item: NavItem; pathname: string }) {
               <Link
                 key={child.href}
                 href={child.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "block rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors",
                   active

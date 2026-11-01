@@ -7,6 +7,17 @@
 -- =============================================================================
 
 
+-- NOTE (2026-11-01): the former Section 6 created and seeded casbin_rule.
+-- It was removed for two reasons:
+--   1. Its seed INSERT was missing a comma between two VALUES tuples, which
+--      made this entire migration fail to parse - so it had never run.
+--   2. Casbin is being dropped outright; with one kind of user it computes the
+--      same answer for everyone, while leaving a newly registered tenant unable
+--      to edit its own portfolio. See .claude/steering/decisions.md ADR-018.
+-- 0006_platform_signup.sql drops the table if an earlier run created it.
+-- Sections 7 and 8 are complementary, not duplicates: 7 creates tools on a
+-- fresh install, 8 upgrades an existing single-owner tools table.
+
 -- =============================================================================
 -- Section 1: profiles table, indexes, and RLS policies
 -- =============================================================================
@@ -272,44 +283,7 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- =============================================================================
--- Section 6: casbin_rule table and RBAC seed data
--- =============================================================================
-
-create table if not exists public.casbin_rule (
-  id    serial primary key,
-  ptype text,
-  v0    text,
-  v1    text,
-  v2    text,
-  v3    text,
-  v4    text,
-  v5    text
-);
-
--- Seed initial RBAC policies (idempotent)
--- role 'admin' may read: dashboard, projects, blog, settings
--- role 'editor' may read: dashboard, projects, blog
-insert into public.casbin_rule (ptype, v0, v1, v2) values
-  ('p', 'admin',  'dashboard', 'read'),
-  ('p', 'admin',  'projects',  'read'),
-  ('p', 'admin',  'blog',      'read'),
-  ('p', 'admin',  'settings',  'read'),
-  ('p', 'admin', 'about',        'read'),
-  ('p', 'admin', 'tools',        'read'),
-  ('p', 'admin', 'testimonials', 'read')
-  ('p', 'editor', 'dashboard', 'read'),
-  ('p', 'editor', 'projects',  'read'),
-  ('p', 'editor', 'blog',      'read')
-on conflict do nothing;
-
--- Role assignments: dimas → admin, yudhana → editor
-insert into public.casbin_rule (ptype, v0, v1) values
-  ('g', 'dimas',   'admin'),
-  ('g', 'yudhana', 'editor')
-on conflict do nothing;
-
--- =============================================================================
--- Section 7: Storage RLS — per-user path isolation
+-- Section 6: Storage RLS — per-user path isolation
 -- =============================================================================
 
 -- Drop and recreate per-user write policies on storage.objects
@@ -343,7 +317,7 @@ create policy "media_auth_delete" on storage.objects
 -- unchanged. This migration only replaces the authenticated write policies.
 
 -- =============================================================================
--- Section: Multi-Tenant Tools Table
+-- Section 7: tools table, indexes, and RLS policies — fresh-install path
 -- =============================================================================
 
 create table if not exists public.tools (
@@ -402,7 +376,7 @@ create policy "tools_delete" on public.tools
   using (user_id = (select id from public.profiles where id = auth.uid()));
 
 -- =============================================================================
--- Migration: Add user_id to tools & convert to Multi-Tenant
+-- Section 8: migrate an existing single-owner tools table — upgrade path
 -- =============================================================================
 
 -- 1. Tambahkan kolom user_id jika belum ada

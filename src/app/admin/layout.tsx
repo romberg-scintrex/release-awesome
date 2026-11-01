@@ -4,7 +4,8 @@ import { ExternalLink, LogOut } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { NavbarAdmin } from "@/components/Layouts/AdminNavbar";
 import { createClient } from "@/lib/supabase/server";
-import { getVisibleNavItems } from "@/lib/casbin/enforcer";
+import { getOwnProfile } from "@/lib/admin/queries";
+import { PendingNotice } from "@/components/Fragments/PendingNotice";
 import { signOut } from "./action";
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export default async function AdminLayout( {children}: {children: React.ReactNod
     return <div className="min-h-screen bg-[rgb(var(--bg))]">{children}</div>;
   }
 
-  const visibleItems = await getVisibleNavItems(user.email ?? "");
+  const own = await getOwnProfile();
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))]">
@@ -39,7 +40,7 @@ export default async function AdminLayout( {children}: {children: React.ReactNod
               </span>
             </Link>
 
-            <NavbarAdmin visibleItems={visibleItems} />
+            <NavbarAdmin />
 
             <div className="mt-6 space-y-1 border-t border-black/10 pt-4 dark:border-white/10">
               <p className="truncate px-2.5 text-xs text-ink-400 dark:text-ink-400">
@@ -69,7 +70,12 @@ export default async function AdminLayout( {children}: {children: React.ReactNod
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1">
+          {own && own.status && own.status !== "approved" && (
+            <PendingNotice status={own.status} username={own.username} />
+          )}
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -70,7 +70,15 @@ const FIELD_KEYS: FieldKey[] = ["name", "email", "subject", "message"];
 const STATUS_RESET_DELAY = 4500;
 
 // ─── Hook ───────────────────────────────────────────────────────────────────
-export function useContactForm(): [ContactFormState, ContactFormActions] {
+/**
+ * @param username The tenant whose portfolio this form sits on. Omitted on the
+ *   platform-level form at /contact, which the handler routes to
+ *   CONTACT_TO_EMAIL. When present, the handler resolves that tenant's own
+ *   verified address and never falls back to the operator's inbox.
+ */
+export function useContactForm(
+  username?: string,
+): [ContactFormState, ContactFormActions] {
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -146,6 +154,7 @@ export function useContactForm(): [ContactFormState, ContactFormActions] {
             message: fields.message.value,
             company: honeypot,
             turnstileToken,
+            username: username ?? "",
           }),
         });
 
@@ -176,7 +185,7 @@ export function useContactForm(): [ContactFormState, ContactFormActions] {
         scheduleReset(5000);
       }
     },
-    [fields, honeypot, turnstileToken, scheduleReset],
+    [fields, honeypot, turnstileToken, scheduleReset, username],
   );
 
   const state: ContactFormState = { fields, status, errorMsg, turnstileToken, honeypot };

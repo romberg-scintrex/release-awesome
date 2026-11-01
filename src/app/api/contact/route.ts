@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { createRateLimiter, clientIp } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
+import { SUPABASE_URL } from "@/lib/supabase/config";
+import { getProfileByUsername } from "@/lib/queries-by-user";
+import { normalizeUsername } from "@/lib/username";
 
 /**
  * Contact form backend.
@@ -17,27 +23,77 @@ import { Resend } from "resend";
 
 const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_PER_WINDOW = 5;
-const hits = new Map<string, number[]>();
+const limiter = createRateLimiter({ windowMs: WINDOW_MS, max: MAX_PER_WINDOW });
 
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  for (const [key, times] of hits) {
-    if (times.length === 0 || now - times.at(-1)! >= WINDOW_MS) {
-      hits.delete(key);
+/**
+ * Second budget, keyed on the recipient rather than the sender.
+ *
+ * Every tenant's mail leaves on the platform's one verified domain, so its
+ * sender reputation is shared. Without this, a single tenant can be flooded
+ * from many addresses and the complaints land on everyone's deliverability.
+ */
+const TENANT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const TENANT_MAX_PER_WINDOW = 20;
+const tenantLimiter = createRateLimiter({
+  windowMs: TENANT_WINDOW_MS,
+  max: TENANT_MAX_PER_WINDOW,
+});
+
+type Recipient = { to: string } | { error: string; status: number };
+
+/**
+ * Who this message is for.
+ *
+ * No `username` means the platform-level form at /contact, which goes to
+ * CONTACT_TO_EMAIL. A `username` that is present but unusable is an **error**,
+ * never a fallback to that address - routing a tenant's correspondence to the
+ * operator's inbox is the defect this exists to fix.
+ *
+ * The verified `auth.users.email` is the target, not `profiles.email`: that
+ * column is tenant-editable free text, is empty for every newly registered
+ * tenant, and would let a tenant point the platform's verified domain at a
+ * third party.
+ */
+async function resolveRecipient(rawUsername: string): Promise<Recipient> {
+  if (!rawUsername) {
+    const to = process.env.CONTACT_TO_EMAIL;
+    if (!to) {
+      console.error("[contact] CONTACT_TO_EMAIL is not configured.");
+      return { error: "The contact form isn't configured yet.", status: 500 };
     }
+    return { to };
   }
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  return recent.length > MAX_PER_WINDOW;
-}
 
-function clientIp(req: Request): string {
-  const realIp = req.headers.get("x-real-ip");
-  if (realIp) return realIp.trim();
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",").at(-1)!.trim();
-  return "unknown";
+  const username = normalizeUsername(rawUsername);
+
+  // Anon client: migration 0006 narrows its policy to approved profiles, so an
+  // unapproved tenant resolves to null here without a second status check.
+  const profile = await getProfileByUsername(username);
+  if (!profile) {
+    return { error: "This portfolio cannot receive messages.", status: 404 };
+  }
+
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) {
+    console.error(
+      "[contact] SUPABASE_SERVICE_ROLE_KEY is not set - cannot read the tenant's verified email.",
+    );
+    return { error: "The contact form isn't configured yet.", status: 500 };
+  }
+
+  try {
+    const admin = createSupabaseClient(SUPABASE_URL, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await admin.auth.admin.getUserById(profile.id);
+    const to = data?.user?.email;
+    if (error || !to) {
+      return { error: "This portfolio cannot receive messages.", status: 404 };
+    }
+    return { to };
+  } catch {
+    return { error: "This portfolio cannot receive messages.", status: 404 };
+  }
 }
 
 function isEmail(v: string): boolean {
@@ -46,36 +102,6 @@ function isEmail(v: string): boolean {
 
 function bad(error: string, status = 422) {
   return NextResponse.json({ ok: false, error }, { status });
-}
-
-async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) {
-    const widgetEnabled = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
-    if (process.env.NODE_ENV === "production" && widgetEnabled) {
-      console.error(
-        "[contact] TURNSTILE_SECRET_KEY missing while site key is set - rejecting submission.",
-      );
-      return false;
-    }
-    console.warn("[contact] TURNSTILE_SECRET_KEY not set - skipping CAPTCHA check.");
-    return true;
-  }
-  if (!token) return false;
-
-  const body = new URLSearchParams({ secret, response: token });
-  if (ip && ip !== "unknown") body.append("remoteip", ip);
-
-  try {
-    const res = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      { method: "POST", body },
-    );
-    const data = (await res.json()) as { success?: boolean };
-    return data.success === true;
-  } catch {
-    return false;
-  }
 }
 
 function toString(value: unknown): string {
@@ -119,13 +145,14 @@ export async function POST(req: Request) {
   const message = toString(payload.message).trim();
   const company = toString(payload.company); // honeypot (raw, untrimmed)
   const token = toString(payload.turnstileToken);
+  const username = toString(payload.username).trim();
 
   // 1) Honeypot — pretend success so bots don't retry.
   if (company) return NextResponse.json({ ok: true });
 
   // 2) Rate limit
   const ip = clientIp(req);
-  if (rateLimited(ip)) {
+  if (limiter.limited(ip)) {
     return bad("Too many messages from this connection. Please try again later.", 429);
   }
 
@@ -142,24 +169,45 @@ export async function POST(req: Request) {
     return bad("Captcha verification failed. Please try again.", 400);
   }
 
-  // 5) Send the email
+  // 5) Per-recipient budget, so one tenant cannot be flooded from many IPs.
+  if (username && tenantLimiter.limited(normalizeUsername(username))) {
+    return bad("This portfolio has received too many messages. Please try again later.", 429);
+  }
+
+  // 6) Who it goes to. Never CONTACT_TO_EMAIL for a tenant.
+  const recipient = await resolveRecipient(username);
+  if ("error" in recipient) return bad(recipient.error, recipient.status);
+
+  // 7) Send the email
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL;
-  if (!apiKey || !to) {
-    console.error("[contact] RESEND_API_KEY or CONTACT_TO_EMAIL is not configured.");
+  if (!apiKey) {
+    console.error("[contact] RESEND_API_KEY is not configured.");
     return NextResponse.json(
       { ok: false, error: "The contact form isn't configured yet." },
       { status: 500 },
     );
   }
 
-  const from = process.env.CONTACT_FROM_EMAIL || "Portfolio <onboarding@resend.dev>";
+  // No onboarding@resend.dev fallback: Resend restricts that sender to the
+  // account owner's own address and returns 403 for anyone else, which would
+  // fail for every tenant but one. A verified domain is a prerequisite.
+  const from = process.env.CONTACT_FROM_EMAIL;
+  if (!from) {
+    console.error(
+      "[contact] CONTACT_FROM_EMAIL is not set. Verify a domain in Resend and use an address on it.",
+    );
+    return NextResponse.json(
+      { ok: false, error: "The contact form isn't configured yet." },
+      { status: 500 },
+    );
+  }
+
   const resend = new Resend(apiKey);
 
   try {
     const { error } = await resend.emails.send({
       from,
-      to: [to],
+      to: [recipient.to],
       replyTo: email,
       subject: `New message from ${name}${subject ? ` - ${subject}` : ""}`,
       text:

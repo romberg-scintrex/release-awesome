@@ -14,11 +14,11 @@ export async function generateMetadata({ params }: ProfileLayoutProps): Promise<
   const { username } = await params;
   const profile = await getProfileByUsername(username);
 
-  if (!profile) {
-    return {
-      title: "Profile Not Found",
-    };
-  }
+  // Deliberately empty. A 404 must not advertise a title, and more to the
+  // point: an unapproved portfolio and a username that was never registered
+  // have to be indistinguishable, or approval status becomes enumerable from
+  // the outside. Both arrive here as `null`.
+  if (!profile) return {};
 
   const title = `${profile.name} - ${profile.role ?? "Software Engineer"}`;
   const description = profile.description || SITE.description;
@@ -76,7 +76,10 @@ export default async function ProfileLayout({
 
   const profile = await getProfileByUsername(username);
 
-  if (!profile) {
+  // getProfileByUsername already refuses anything not approved; this is the
+  // second reading of the same fact, kept because the layout is the one place
+  // guaranteed to run for every tenant route.
+  if (!profile || profile.status !== "approved") {
     notFound();
   }
 

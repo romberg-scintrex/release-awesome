@@ -17,6 +17,8 @@ import {
   ArrowUp,
   ArrowDown,
   type LucideIcon,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { GithubIcon, LinkedinIcon, FacebookIcon } from "@/components/Elements/Icons";
 import { useSettings } from "@/components/Elements/Providers/SettingsProvider";
@@ -61,6 +63,8 @@ export function CommandPalette() {
       { id: "home", label: "Home", group: "Navigate", icon: Home, perform: () => go("/"), keywords: "landing main" },
       { id: "about", label: "About", group: "Navigate", icon: User, perform: () => go("/about"), keywords: "bio story me" },
       { id: "contact", label: "Contact", group: "Navigate", icon: Mail, perform: () => go("/contact"), keywords: "email reach" },
+      { id: "login", label: "Sign in", group: "Navigate", icon: LogIn, perform: () => go("/login"), keywords: "log in admin dashboard" },
+      { id: "register", label: "Create your portfolio", group: "Navigate", icon: UserPlus, perform: () => go("/register"), keywords: "sign up join register new" },
 
       {
         id: "theme",

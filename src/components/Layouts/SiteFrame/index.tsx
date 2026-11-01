@@ -35,7 +35,14 @@ export function SiteFrame({
   // Memprioritaskan prop profile jika dipass langsung, jika tidak gunakan dari context
   const profile = propProfile ?? contextProfile;
 
-  if (pathname?.startsWith("/admin")) {
+  // Bare children for the CMS and the auth pages. Sign-in and registration are
+  // self-contained - they link to each other and nowhere else - so the public
+  // navbar, footer, custom cursor, smooth scroll and command palette would all
+  // be weight with nothing to do.
+  const bare =
+    pathname?.startsWith("/admin") || pathname === "/login" || pathname === "/register";
+
+  if (bare) {
     return <>{children}</>;
   }
 

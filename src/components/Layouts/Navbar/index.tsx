@@ -11,6 +11,7 @@ import {
 } from "framer-motion";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isTenantSegment } from "@/lib/routes";
 import { ThemeToggle } from "../../Elements/ThemeToggle";
 import type { Profile } from "@/lib/types";
 
@@ -31,20 +32,24 @@ export function Navbar({ profile }: NavbarProps) {
   const segments = pathname.split("/").filter(Boolean);
   const firstSegment = segments[0] ?? "";
 
-  // Daftar root route statis yang BUKAN username
-  const staticRoutes = ["about", "blog", "contact", "admin", "api"];
-  const isUsernameRoute = firstSegment && !staticRoutes.includes(firstSegment);
-
-  // Ambil username dari profile (jika ada) ATAU dari URL segment
-  const username = profile?.username || (isUsernameRoute ? firstSegment : "");
+  // Which root segments are platform pages rather than usernames lives in
+  // src/lib/routes.ts, cross-checked against reserved_usernames by a test.
+  const username = profile?.username || (isTenantSegment(firstSegment) ? firstSegment : "");
   const basePath = username ? `/${username}` : "";
 
-  // Dynamic Navigation Items
-  const NAV = [
-    { href: basePath || "/", label: "Home" },
-    { href: `${basePath}/about`, label: "About" },
-    { href: `${basePath}/blog`, label: "Blog" },
-  ];
+  // The root is the platform surface and has no content pages of its own, so
+  // there is nothing to navigate between there - the actions are sign in and
+  // register, which live in the right cluster. See ADR-015.
+  const isPlatform = !username;
+
+  const NAV = isPlatform
+    ? []
+    : [
+        { href: basePath, label: "Home" },
+        { href: `${basePath}/about`, label: "About" },
+        { href: `${basePath}/blog`, label: "Blog" },
+        { href: `${basePath}/tools`, label: "Tools" },
+      ];
 
   const contactHref = `${basePath}/contact`;
 
@@ -126,9 +131,10 @@ export function Navbar({ profile }: NavbarProps) {
           })}
         </div>
 
-        {/* Mobile menu toggle */}
+        {/* Mobile menu toggle — nothing to open on the platform surface */}
         <button
           type="button"
+          hidden={NAV.length === 0}
           onClick={() => setMenuOpen((open) => !open)}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
@@ -146,20 +152,45 @@ export function Navbar({ profile }: NavbarProps) {
             className="hidden sm:block h-6 w-px bg-black/10 mx-1"
           />
 
-          <Link
-            href={contactHref}
-            className={cn(
-              "inline-flex group items-center gap-1.5 h-9 rounded-full pl-3.5 pr-2 text-xs font-semibold",
-              "bg-black text-white",
-              "shadow-[0_8px_20px_-10px_rgba(0,0,0,0.55)]",
-              "transition-transform duration-200 hover:-translate-y-0.5",
-            )}
-          >
-            Let&apos;s talk{" "}
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 transition-transform duration-200 group-hover:rotate-45">
-              <ArrowUpRight size={12} />
-            </span>
-          </Link>
+          {isPlatform ? (
+            <>
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex h-9 items-center rounded-full px-3 text-xs font-semibold text-ink-700 transition-colors hover:bg-black/[0.05] hover:text-ink-950"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                className={cn(
+                  "inline-flex group items-center gap-1.5 h-9 rounded-full pl-3.5 pr-2 text-xs font-semibold",
+                  "bg-black text-white",
+                  "shadow-[0_8px_20px_-10px_rgba(0,0,0,0.55)]",
+                  "transition-transform duration-200 hover:-translate-y-0.5",
+                )}
+              >
+                Create portfolio{" "}
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 transition-transform duration-200 group-hover:rotate-45">
+                  <ArrowUpRight size={12} />
+                </span>
+              </Link>
+            </>
+          ) : (
+            <Link
+              href={contactHref}
+              className={cn(
+                "inline-flex group items-center gap-1.5 h-9 rounded-full pl-3.5 pr-2 text-xs font-semibold",
+                "bg-black text-white",
+                "shadow-[0_8px_20px_-10px_rgba(0,0,0,0.55)]",
+                "transition-transform duration-200 hover:-translate-y-0.5",
+              )}
+            >
+              Let&apos;s talk{" "}
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 transition-transform duration-200 group-hover:rotate-45">
+                <ArrowUpRight size={12} />
+              </span>
+            </Link>
+          )}
         </div>
 
         {/* Scroll-progress thread */}

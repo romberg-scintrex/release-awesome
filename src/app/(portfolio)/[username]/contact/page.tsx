@@ -124,7 +124,7 @@ export default async function TenantContactPage({ params }: Props) {
             />
           </Reveal>
           <Reveal delay={0.05}>
-            <ContactForm />
+            <ContactForm username={profile.username} />
           </Reveal>
         </div>
       </section>
