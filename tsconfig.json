@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "src/components/Elements/ScrollSmooth/index.tsx.bak", "src/components/Fragments/ScrollyTelling/index.tsx"  ],
+, "src/components/Elements/ScrollSmooth/index.tsx.bak", "src/components/Fragments/ScrollyTelling/index.tsx", "src/app/(portfolio)/[username]/page.tsx.bak"  ],
   "exclude": ["node_modules", "vitest.config.ts"]
 }

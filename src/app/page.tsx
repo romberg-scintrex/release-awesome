@@ -1,11 +1,6 @@
-import { Metadata } from "next";
-import { HeroSection } from "@/components/Layouts/HeroSection";
-import { MarqueeTech } from "@/components/Layouts/MarqueeTech";
-import { WritingSliderSection } from "@/components/Layouts/WritingSliderSection";
-import { Testimonials } from "@/components/Layouts/Testimonials";
-import { SITE, jsonLdHtml } from "@/lib/utils";
-import { getSettings, getTestimonials, getTools } from "@/lib/queries";
-import { defaultSlides } from "@/lib/default";
+import type { Metadata } from "next";
+import { PlatformHome } from "@/components/Layouts/PlatformHome";
+import { getApprovedProfiles } from "@/lib/queries-by-user";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -14,71 +9,11 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function Home() {
+  // The only read this page makes, and it degrades to [] - the homepage has no
+  // other dependency on the database and must render without one.
+  const showcase = await getApprovedProfiles(6);
 
-    const [ settings, testimonials, tools ] = await Promise.all([
-    getSettings(),
-    getTestimonials(),
-    getTools(),
-  ]);
-  
-  const profilePageLd = {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    "@id": `${SITE.url}/#profilepage`,
-    url: SITE.url,
-    mainEntity: { "@id": `${SITE.url}/#person` },
-  };
-
-  return (
-    <>
-      {/* Preload the desktop hero textures so the browser fetches them during the
-          initial HTML parse - in parallel with the JS bundle - instead of only
-          after three.js dynamically loads inside <MaskRevealHero/>. crossOrigin
-          matches three's TextureLoader (anonymous) so the preload is reused rather
-          than re-fetched; media-gated to >=md so phones (which render <MobileHero/>)
-          skip these and rely on its own <Image priority>. */}
-      <link
-        rel="preload"
-        as="image"
-        href={settings.heroBackURL ?? "/images/p3.webp"}
-        media="(min-width: 768px)"
-        crossOrigin="anonymous"
-        fetchPriority="high"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href={settings.heroFrontURL ?? "/images/p2.avif"}
-        media="(min-width: 768px)"
-        crossOrigin="anonymous"
-        fetchPriority="high"
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLdHtml(profilePageLd) }}
-      />
-      <HeroSection />
-      <MarqueeTech 
-        tools={tools}
-      />
-      <WritingSliderSection 
-        slides={defaultSlides}
-        heading={{
-          index: "01",
-          eyebrow: "Writing",
-          title: "Thoughts worth shipping",
-          description: "Notes from the trenches of building software — lessons learned, ideas explored, and the occasional rabbit hole. Grab a coffee and dig in.",
-        }}
-      />
-      <Testimonials 
-        testimonials={testimonials}
-        heading={{
-          index: "02",
-          eyebrow: "Kind words",
-          title: "What people I've worked with say",
-          description: "Notes from collaborators, mentors, and clients.",
-        }}
-      />
-    </>
-  );
+  // No JSON-LD here: the root layout emits the WebSite block, and a second one
+  // with the same @id would be duplicate structured data.
+  return <PlatformHome showcase={showcase} />;
 }

@@ -15,6 +15,7 @@ import { Button } from "@/components/Elements/Button";
 import { scrollWindowTo } from "@/components/Elements/ScrollSmooth";
 import { useSettings } from "@/components/Elements/Providers/SettingsProvider";
 import { cn, ROLES } from "@/lib/utils";
+import type { Profile } from "@/lib/types";
 
 const LIGHT_STAGE =
   "radial-gradient(ellipse 120% 80% at 50% 22%, #fcfbf6 0%, #f6f4ed 42%, #ece7d8 78%, #e2dbc7 100%)";
@@ -24,21 +25,38 @@ const DARK_STAGE =
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-export function MobileHero({ className }: Readonly<{ className?: string }>) {
+export function MobileHero({
+  className,
+  profile,
+}: Readonly<{ className?: string; profile?: Profile }>) {
   const reduce = useReducedMotion();
-  const settings = useSettings();
+  const globalSettings = useSettings();
+
+  // Memakai data profile tenant jika dikirim, fallback ke global settings jika undefined
+  const name = profile?.name ?? globalSettings.name;
+  const role = profile?.role ?? globalSettings.role;
+  const heroMobileURL =
+    profile?.heroMobileURL ?? globalSettings.heroMobileURL ?? "/images/p3.webp";
+  const cvURL = profile?.cvURL ?? globalSettings.cvURL ?? "/cv.pdf";
+
+  const social = {
+    github: profile?.social?.github ?? globalSettings.social.github,
+    linkedin: profile?.social?.linkedin ?? globalSettings.social.linkedin,
+    facebook: profile?.social?.facebook ?? globalSettings.social.facebook,
+    instagram: profile?.social?.instagram ?? globalSettings.social.instagram,
+  };
 
   // Split name: first word is firstName, the rest carries the emerald underline
-  const nameWords = settings.name.trim().split(/\s+/);
+  const nameWords = name.trim().split(/\s+/);
   const firstName = nameWords[0];
   const lastName = nameWords.length > 1 ? nameWords.slice(1).join(" ") : null;
-  const initial = settings.name.charAt(0).toUpperCase();
+  const initial = name.charAt(0).toUpperCase();
 
   const SOCIALS = [
-    { href: settings.social.github, label: "GitHub", Icon: GithubIcon },
-    { href: settings.social.linkedin, label: "LinkedIn", Icon: LinkedinIcon },
-    { href: settings.social.facebook, label: "Facebook", Icon: FacebookIcon },
-    { href: settings.social.instagram, label: "Instagram", Icon: InstagramIcon },
+    { href: social.github, label: "GitHub", Icon: GithubIcon },
+    { href: social.linkedin, label: "LinkedIn", Icon: LinkedinIcon },
+    { href: social.facebook, label: "Facebook", Icon: FacebookIcon },
+    { href: social.instagram, label: "Instagram", Icon: InstagramIcon },
   ];
 
   return (
@@ -109,8 +127,8 @@ export function MobileHero({ className }: Readonly<{ className?: string }>) {
         style={{ top: "0", bottom: "0" }}
       >
         <Image
-          src={settings.heroMobileURL ?? "/images/p3.webp"}
-          alt={`${settings.name} - ${settings.role}`}
+          src={heroMobileURL}
+          alt={`${name} - ${role}`}
           fill
           priority
           sizes="(max-width: 768px) 100vw, 768px"
@@ -198,60 +216,46 @@ export function MobileHero({ className }: Readonly<{ className?: string }>) {
         >
           {firstName}
           <br />
-          <span className="relative inline-block pb-2">
-            {lastName}
-            <motion.svg
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 1.2, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
-              aria-hidden="true"
-              viewBox="0 0 418 22"
-              className="absolute -bottom-1 left-0 h-[0.28em] w-[102%] -rotate-1 drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(16,185,129,0.8)]"
-              preserveAspectRatio="none"
-              fill="none"
-            >
-              <defs>
-                <linearGradient id="fadeGradientEmerald" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="currentColor" className="text-emerald-500 dark:text-emerald-400" />
-                  <stop offset="70%" stopColor="currentColor" className="text-emerald-500 dark:text-emerald-400" />
-                  <stop offset="100%" stopColor="transparent" />
-                </linearGradient>
-              </defs>
-              {/* Main thick stroke with gradient fade */}
-              <path
-                d="M4 16C120 6 280 4 414 12"
-                stroke="url(#fadeGradientEmerald)"
-                strokeWidth="8"
-                strokeLinecap="round"
-                className="opacity-90"
-              />
-              {/* Subtle secondary stroke */}
-              <path
-                d="M10 18C130 8 270 6 405 14"
-                stroke="url(#fadeGradientEmerald)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                className="opacity-40"
-              />
-            </motion.svg>
-          </span>
-          {/* <span className="sr-only">
-            {" "}
-            - {settings.role}{" "}| Go &amp; Next.js developer in Jakarta, Indonesia
-          </span> */}
+          {lastName && (
+            <span className="relative inline-block pb-2">
+              {lastName}
+              <motion.svg
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 1.2, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                aria-hidden="true"
+                viewBox="0 0 418 22"
+                className="absolute -bottom-1 left-0 h-[0.28em] w-[102%] -rotate-1 drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(16,185,129,0.8)]"
+                preserveAspectRatio="none"
+                fill="none"
+              >
+                <defs>
+                  <linearGradient id="fadeGradientEmerald" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="currentColor" className="text-emerald-500 dark:text-emerald-400" />
+                    <stop offset="70%" stopColor="currentColor" className="text-emerald-500 dark:text-emerald-400" />
+                    <stop offset="100%" stopColor="transparent" />
+                  </linearGradient>
+                </defs>
+                {/* Main thick stroke with gradient fade */}
+                <path
+                  d="M4 16C120 6 280 4 414 12"
+                  stroke="url(#fadeGradientEmerald)"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  className="opacity-90"
+                />
+                {/* Subtle secondary stroke */}
+                <path
+                  d="M10 18C130 8 270 6 405 14"
+                  stroke="url(#fadeGradientEmerald)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  className="opacity-40"
+                />
+              </motion.svg>
+            </span>
+          )}
         </motion.h1>
-
-        {/* role + tagline */}
-        {/* <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.56, ease }}
-          className="mt-3"
-        >
-          <p className="max-w-[20rem] text-sm leading-relaxed text-ink-600 dark:text-emerald-200/70">
-            {settings.role}{" "}| Go &amp; Next.js developer in Jakarta, Indonesia
-          </p>
-        </motion.div> */}
 
         {/* rail — socials + actions */}
         <motion.div
@@ -266,18 +270,20 @@ export function MobileHero({ className }: Readonly<{ className?: string }>) {
               <RoleTypewriter />
             </div>
             <div className="flex items-center gap-3 text-ink-400 dark:text-emerald-200/60">
-              {SOCIALS.map(({ href, label, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={label}
-                  className="transition-colors hover:text-ink-900 dark:hover:text-emerald-100"
-                >
-                  <Icon size={16} />
-                </a>
-              ))}
+              {SOCIALS.map(({ href, label, Icon }) =>
+                href ? (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    className="transition-colors hover:text-ink-900 dark:hover:text-emerald-100"
+                  >
+                    <Icon size={16} />
+                  </a>
+                ) : null
+              )}
             </div>
           </div>
 
@@ -288,7 +294,7 @@ export function MobileHero({ className }: Readonly<{ className?: string }>) {
                 <ArrowUpRight size={15} />
               </Button>
             </Link>
-            <a href={settings.cvURL ?? "/cv.pdf"} download data-track="cv" className="flex-1">
+            <a href={cvURL} download data-track="cv" className="flex-1">
               <Button variant="ghost" size="sm" className="w-full border border-black/10 dark:border-white/10 dark:text-emerald-100 dark:hover:bg-white/10">
                 <Download size={14} />
                 Resume

@@ -35,6 +35,26 @@ export const ROLES = [
   "Next JS Developer",
 ];
 
+/**
+ * Platform identity, for the root surface.
+ *
+ * SITE below is the *primary owner's* identity, which is no longer what the
+ * root represents: per ADR-015 the root is the platform and every portfolio
+ * lives at /:username. SITE is still the fallback for seed data and for the
+ * owner's own pages.
+ *
+ * TODO(naming): "Portfolio Platform" is a placeholder. The product has no name
+ * yet and choosing one is a product decision, not an implementation detail -
+ * every string here is meant to be replaced.
+ */
+export const PLATFORM = {
+  name: "Portfolio Platform",
+  description:
+    "Claim a username and get a portfolio at that address. Publish your " +
+    "projects, write your story, keep a blog - from an admin panel that is yours alone.",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://release-awesome.vercel.app",
+} as const;
+
 export const SITE = {
   name: "Gregorius Dimas A Yudhana",
   shortName: "Grek",

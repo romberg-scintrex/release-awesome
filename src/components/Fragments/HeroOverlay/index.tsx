@@ -14,20 +14,34 @@ import { Button } from "@/components/Elements/Button";
 import { scrollWindowTo } from "@/components/Elements/ScrollSmooth";
 import { useSettings } from "@/components/Elements/Providers/SettingsProvider";
 import { ROLES } from "@/lib/utils";
+import type { Profile } from "@/lib/types";
 
-export function HeroOverlay() {
+interface HeroOverlayProps {
+  profile?: Profile;
+}
+
+export function HeroOverlay({ profile }: HeroOverlayProps) {
   const prefersReducedMotion = useReducedMotion();
   const settings = useSettings();
 
+  // Memakai data profile tenant jika dikirim, fallback ke global settings
+  const githubURL = profile?.social?.github ?? settings.social.github;
+  const linkedinURL = profile?.social?.linkedin ?? settings.social.linkedin;
+  const facebookURL = profile?.social?.facebook ?? settings.social.facebook;
+  const instagramURL = profile?.social?.instagram ?? settings.social.instagram;
+  const fullName = profile?.name ?? settings.name;
+  const university = profile?.university ?? settings.university;
+  const cvURL = profile?.cvURL ?? settings.cvURL ?? "/cv.pdf";
+
   const SOCIALS = [
-    { href: settings.social.github, label: "GitHub", Icon: GithubIcon },
-    { href: settings.social.linkedin, label: "LinkedIn", Icon: LinkedinIcon },
-    { href: settings.social.facebook, label: "Facebook", Icon: FacebookIcon },
-    { href: settings.social.instagram, label: "Instagram", Icon: InstagramIcon },
+    { href: githubURL, label: "GitHub", Icon: GithubIcon },
+    { href: linkedinURL, label: "LinkedIn", Icon: LinkedinIcon },
+    { href: facebookURL, label: "Facebook", Icon: FacebookIcon },
+    { href: instagramURL, label: "Instagram", Icon: InstagramIcon },
   ];
 
   // Split nama: kata pertama firstName, sisanya lastName dengan efek underline gradien
-  const nameWords = settings.name.trim().split(/\s+/);
+  const nameWords = fullName.trim().split(/\s+/);
   const firstName = nameWords[0];
   const lastName = nameWords.length > 1 ? nameWords.slice(1).join(" ") : null;
 
@@ -130,16 +144,12 @@ export function HeroOverlay() {
                   </>
                 )}
               </span>
-              {/* <span className="sr-only">
-                {" "}
-                - {settings.role}{" "}| Go &amp; Next JS developer in Jakarta, Indonesia
-              </span> */}
             </h1>
             <div className="mt-1 flex items-baseline gap-2 truncate">
               <RoleTypewriter />
               <span aria-hidden className="hidden sm:inline-block text-[rgb(var(--muted))]">·</span>
               <span className="hidden sm:inline-block truncate text-sm text-[rgb(var(--muted))]">
-                {settings.university}
+                {university}
               </span>
             </div>
           </div>
@@ -167,7 +177,7 @@ export function HeroOverlay() {
                 <ArrowUpRight size={15} />
               </Button>
             </Link>
-            <a href={settings.cvURL ?? "/cv.pdf"} download data-track="cv" className="flex-1 sm:flex-initial">
+            <a href={cvURL} download data-track="cv" className="flex-1 sm:flex-initial">
               <Button
                 variant="ghost"
                 size="sm"

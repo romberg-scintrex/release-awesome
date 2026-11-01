@@ -1,8 +1,16 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { notFound } from "next/navigation";
 import { ToolForm } from "@/components/Fragments/ToolForm";
+import { createClient } from "@/lib/supabase/server";
 
-export default function NewToolPage() {
+export default async function NewToolPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) notFound();
+
   return (
     <div>
       <Link
@@ -13,7 +21,7 @@ export default function NewToolPage() {
         Tools
       </Link>
       <h1 className="mb-6 mt-3 font-display text-2xl font-semibold tracking-tight">New tool</h1>
-      <ToolForm />
+      <ToolForm userId={user.id} />
     </div>
   );
 }

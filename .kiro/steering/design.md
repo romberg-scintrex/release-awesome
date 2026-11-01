@@ -154,3 +154,5 @@ All animations have `prefers-reduced-motion` alternatives — either `animation:
 - Inputs: `rounded-xl border border-black/10 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent/40 dark:bg-ink-800`.
 - No Navbar, Footer, or CommandPalette in admin — `SiteFrame` early-returns bare children for `/admin` routes.
 - `not-found.tsx` detects `/admin` pathname → shows "Back to Dashboard" instead of "Back to Home".
+- `NavbarAdmin` accepts `visibleItems: NavItemKey[]` prop — renders only the nav items the current user is permitted to see per Casbin policy. The prop is computed server-side in the admin layout and passed down; the component itself remains `"use client"`.
+- Admin layout (`src/app/admin/layout.tsx`) calls `getVisibleNavItems(user.email)` before rendering children. Casbin enforce errors fall back to `["dashboard"]` — never block the layout entirely.

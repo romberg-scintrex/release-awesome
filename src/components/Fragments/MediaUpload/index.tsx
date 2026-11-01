@@ -8,7 +8,8 @@ interface MediaUploadProps {
   label: string;
   value: string | null;
   onChange: (url: string | null) => void;
-  folder: string;
+  /** The authenticated user's ID (auth.uid()). Passed to uploadFile as the storage path prefix. */
+  userId: string;
   accept?: string;
   preview?: "image" | "file" | "none";
   hint?: string;
@@ -18,7 +19,7 @@ export function MediaUpload({
   label,
   value,
   onChange,
-  folder,
+  userId,
   accept = "image/*",
   preview = "image",
   hint,
@@ -32,7 +33,7 @@ export function MediaUpload({
     setBusy(true);
     setError(null);
     try {
-      const url = await uploadFile(file, folder);
+      const url = await uploadFile(file, userId);
       onChange(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");

@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/Elements/Providers/ThemeProvider";
 import { SettingsProvider } from "@/components/Elements/Providers/SettingsProvider";
 import { SiteFrame } from "@/components/Layouts/SiteFrame";
 import { getSettings } from "@/lib/queries";
-import { SITE, jsonLdHtml } from "@/lib/utils";
+import { PLATFORM, jsonLdHtml } from "@/lib/utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,31 +28,15 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE.url),
+  metadataBase: new URL(PLATFORM.url),
   title: {
-    default: "Gregorius Dimas A Yudhana - Software Engineer | Indonesia",
-    template: `%s - ${SITE.name}`,
+    default: PLATFORM.name,
+    template: `%s - ${PLATFORM.name}`,
   },
-  description: SITE.description,
-  keywords: [
-    "Gregorius Dimas A Yudhana",
-    "Dimas A Yudhana",
-    "Dimas Yudhana",
-    "Dimas A Yudhana portfolio",
-    "Backend Golang Developer Jakarta Indonesia",
-    "React developer Jakarta Indonesia",
-    "NextJS developer Jakarta Indonesia",
-    "Next.js developer Jakarta Indonesia",
-    "full stack developer Jakarta Indonesia",
-    "software engineer Jakarta Indonesia",
-    "Universitas Brawijaya",
-    "Brawijaya University",
-    "Universitas Brawijaya software engineer",
-    "Brawijaya University software engineer",
-  ],
-  authors: [{ name: SITE.name, url: SITE.url }],
-  creator: SITE.name,
-  publisher: SITE.name,
+  description: PLATFORM.description,
+  authors: [{ name: PLATFORM.name, url: PLATFORM.url }],
+  creator: PLATFORM.name,
+  publisher: PLATFORM.name,
   robots: {
     index: true,
     follow: true,
@@ -67,15 +51,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: SITE.url,
-    title: "Gregorius Dimas A Yudhana | Software Engineer Jakarta Indonesia",
-    description: SITE.description,
-    siteName: SITE.name,
+    url: PLATFORM.url,
+    title: PLATFORM.name,
+    description: PLATFORM.description,
+    siteName: PLATFORM.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gregorius Dimas A Yudhana | Software Engineer Jakarta Indonesia",
-    description: SITE.description,
+    title: PLATFORM.name,
+    description: PLATFORM.description,
   },
   icons: {
     icon: [
@@ -103,58 +87,21 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const settings = await getSettings();
 
-  // ── JSON-LD structured data — lets Google understand exactly who this site is
-  //    about. Strong signal for ranking the name and a shot at a knowledge panel.
-  const personLd = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "@id": `${SITE.url}/#person`,
-    name: settings.name,
-    url: SITE.url,
-    image: `${SITE.url}/opengraph-image`,
-    jobTitle: "Software Engineer",
-    description: SITE.description,
-    email: `mailto:${settings.email}`,
-    nationality: { "@type": "Country", name: "Indonesia" },
-    knowsLanguage: ["en", "id"],
-    worksFor: { "@type": "Organization", name: "Universitas Brawijaya" },
-    alumniOf: {
-      "@type": "CollegeOrUniversity",
-      name: settings.university,
-    },
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Jakarta",
-      addressRegion: "DKI Jakarta",
-      addressCountry: "ID",
-    },
-    knowsAbout: [
-      "Golang",
-      "Next.js",
-      "React",
-      "TypeScript",
-      "PostgreSQL",
-      "Microservices",
-      "Docker",
-      "AWS",
-      "AI Enthusiast",
-    ],
-    sameAs: [
-      settings.social.github,
-      settings.social.linkedin,
-      settings.social.facebook,
-      settings.social.instagram,
-    ].filter(Boolean),
-  };
-
+  // JSON-LD for the platform. Person and ProfilePage describe a tenant and
+  // belong on /:username pages, which build their own - the root must not
+  // claim to be about any individual. See ADR-015.
   const websiteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": `${SITE.url}/#website`,
-    name: settings.name,
-    url: SITE.url,
-    publisher: { "@id": `${SITE.url}/#person` },
+    "@id": `${PLATFORM.url}/#website`,
+    name: PLATFORM.name,
+    url: PLATFORM.url,
+    description: PLATFORM.description,
     inLanguage: "en",
+    potentialAction: {
+      "@type": "RegisterAction",
+      target: `${PLATFORM.url}/register`,
+    },
   };
 
   return (
@@ -163,10 +110,6 @@ export default async function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} font-sans selection:bg-accent/30`}
       >
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdHtml(personLd) }}
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdHtml(websiteLd) }}
